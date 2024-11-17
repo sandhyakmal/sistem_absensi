@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Pastikan pengguna sudah login dan memiliki session username
+// Pastikan pengguna sudah login dan memiliki session usernamegit push -u origin main
 if (!isset($_SESSION['username']) || !isset($_SESSION['role'])) {
     echo "<script>
         alert('Login terlebih dahulu');
