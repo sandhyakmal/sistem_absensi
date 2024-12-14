@@ -77,8 +77,8 @@ include 'koneksi.php';
                                         if ($_SESSION['role'] == 'owner') {
                                     ?>
                                      <td>
-                                        <form action="index.php?page=ubah_data_karyawan" method="POST" style="display:inline;">
-                                            <input type="hidden" name="id_karyawan" value="<?php echo $data['id']; ?>">
+                                        <form action="index.php?page=ubah_data_payroll" method="POST" style="display:inline;">
+                                            <input type="hidden" name="id" value="<?php echo $data['id']; ?>">
                                             <button type="submit" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> Edit</button>
                                         </form>
                                         <!-- <a href="index.php?page=ubah_data_karyawan&id_karyawan=<?php echo $data['id'] ?>" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> Edit</a> -->

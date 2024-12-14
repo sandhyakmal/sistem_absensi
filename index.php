@@ -417,6 +417,8 @@ $laporan_absensi = "/hris/index.php?page=laporan_absensi";
             include "pages/data_payroll/tambah_data_payroll.php";
         } else if ($page == 'hapus_data_payroll') {
             include "pages/data_payroll/hapus_data_payroll.php";
+        } else if ($page == 'ubah_data_payroll') {
+            include "pages/data_payroll/ubah_data_payroll.php";
         }
 
          //slip gaji dan laporan

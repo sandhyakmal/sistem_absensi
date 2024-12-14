@@ -1,6 +1,6 @@
 <script>
         $(document).ready(function() {
-            $('#salary, #upah_lembur, #potongan, #bonus, #lembur').mask('#.##0', {reverse: true});
+            $('#salary, #upah_lembur, #potongan, #bonus, #lembur,#total_lembur, #total').mask('#.##0', {reverse: true});
         });
 
         $(document).ready(function() {
