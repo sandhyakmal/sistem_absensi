@@ -25,16 +25,21 @@ $tahun = date("Y");
 $id_karyawan = $_POST['id_karyawan'];
 
 //SQL Buat ambil data payroll
-$sql = $conn->query(" SELECT tp.*, tu.name, tu.role, tu.salary FROM tb_payroll tp LEFT JOIN tb_user tu ON tp.id_karyawan = tu.id WHERE tp.id_karyawan = '$id_karyawan'  ");
-$tampil = $sql->fetch_assoc();
+$sql_payroll = $conn->query("   SELECT tp.*, tu.name, tu.role, tu.salary 
+                                FROM tb_payroll tp 
+                                LEFT JOIN tb_user tu ON tp.id_karyawan = tu.id 
+                                WHERE tp.id_karyawan = '$id_karyawan' 
+                                AND tp.bulan_payroll = '$bulan' 
+                                AND tp.tahun_payroll = '$tahun' ");
+$tampil = $sql_payroll->fetch_assoc();
 
 //SQL Buat ambil data Absen
-$sql = $conn->query("SELECT SUM(CASE WHEN type_absen = 'sakit' THEN 1 ELSE 0 END)  AS jumlah_sakit,
-        SUM(CASE WHEN type_absen = 'cuti' THEN 1 ELSE 0 END)  AS jumlah_cuti
-    FROM tb_absen
-    WHERE id_karyawan = '$id_karyawan'
-    AND MONTH(tanggal_absen) = '$bulan'
-    AND YEAR(tanggal_absen) = '$tahun'") ;
+$sql = $conn->query("   SELECT COALESCE(SUM(CASE WHEN type_absen = 'sakit' THEN 1 ELSE 0 END),0)  AS jumlah_sakit,
+                        COALESCE(SUM(CASE WHEN type_absen = 'cuti' THEN 1 ELSE 0 END),0)  AS jumlah_cuti
+                        FROM tb_absen
+                        WHERE id_karyawan = '$id_karyawan'
+                        AND MONTH(tanggal_absen) = '$bulan'
+                        AND YEAR(tanggal_absen) = '$tahun'") ;
 
 if ($sql->num_rows == 0) {
     // Redirect jika tidak ada data

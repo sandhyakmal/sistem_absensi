@@ -42,28 +42,28 @@ if (isset($_POST['id'])) {
 
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input required type="text" class="form-control" id="potongan" value="<?php echo $tampil['potongan']; ?>" name="potongan" placeholder="Potongan">
+                                <input readonly type="text" class="form-control" id="potongan" value="<?php echo $tampil['potongan']; ?>" name="potongan" placeholder="Potongan">
                                 <label for="potongan">Potongan (Rp)</label>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input required type="text" class="form-control" id="bonus" value="<?php echo $tampil['bonus']; ?>" name="bonus" placeholder="Bonus">
+                                <input readonly type="text" class="form-control" id="bonus" value="<?php echo $tampil['bonus']; ?>" name="bonus" placeholder="Bonus">
                                 <label for="bonus">Bonus (Rp)</label>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input required type="text" class="form-control" id="total_lembur" value="<?php echo $tampil['total_lembur']; ?>" name="total_lembur" placeholder="Total Lembut">
+                                <input readonly type="text" class="form-control" id="total_lembur" value="<?php echo $tampil['total_lembur']; ?>" name="total_lembur" placeholder="Total Lembut">
                                 <label for="total_lembur">Total Lembur (Rp)</label>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input required type="text" class="form-control" id="total" value="<?php echo $tampil['total']; ?>" name="total" placeholder="total">
+                                <input readonly type="text" class="form-control" id="total" value="<?php echo $tampil['total']; ?>" name="total" placeholder="total">
                                 <label for="total">Total (Rp)</label>
                             </div>
                         </div>

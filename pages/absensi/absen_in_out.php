@@ -247,52 +247,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['out'])) {
     $jam_akhir   = $shiftData['jam_akhir'];
     $upah_lembur = $shiftData['upah_lembur'];
 
+    $sql_jadwal = "SELECT * FROM tb_jadwal WHERE tanggal_kerja = '$tanggal_kerja' AND status='approve' ";
+    $result_jadwal = $conn->query($sql_jadwal);
 
-    // Hitung lembur jika jam_out lebih dari jam_akhir
-    if ($jam_out > $jam_akhir) {
-        $sqlLembur = "SELECT TIMEDIFF('$jam_out', '$jam_akhir') AS durasi_lembur";
-        $resultLembur = $conn->query($sqlLembur);
-        $lemburData = $resultLembur->fetch_assoc();
-        $durasi_lembur = $lemburData['durasi_lembur'];
+    if ($result_jadwal->num_rows == 0) {
+        // Jika tidak ada data di tb_jadwal, tampilkan pesan error
+        echo "<script>
+            alert('Tanggal kerja tidak ditemukan dalam jadwal Anda. Absen masuk tidak dapat dilakukan.');
+            window.location.href = '?page=absen_in_out';
+        </script>";
     } else {
-        $durasi_lembur = '00:00:00';
+        // Hitung lembur jika jam_out lebih dari jam_akhir
+        if ($jam_out > $jam_akhir) {
+            $sqlLembur = "SELECT TIMEDIFF('$jam_out', '$jam_akhir') AS durasi_lembur";
+            $resultLembur = $conn->query($sqlLembur);
+            $lemburData = $resultLembur->fetch_assoc();
+            $durasi_lembur = $lemburData['durasi_lembur'];
+        } else {
+            $durasi_lembur = '00:00:00';
+        }
+    
+        $upah_per_jam = 15000;
+        $durasi = new DateTime($durasi_lembur);
+        $jam = (int)$durasi->format('H');
+        $menit = (int)$durasi->format('i');
+    
+        // Menghitung total upah lembur
+        $upah_jam = $jam * $upah_per_jam;
+        $upah_menit = ($menit / 60) * $upah_per_jam;
+        $upah_lembur = $upah_jam + $upah_menit;
+    
+        // Output hasil
+        echo "Durasi Lembur: $durasi_lembur<br>";
+        echo "Upah Lembur: Rp" . number_format($upah_lembur, 0, ',', '.');
+    
+        // Insert atau update data absensi dengan durasi lembur
+        $sql_check = "SELECT * FROM tb_absensi WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user'";
+        $result = $conn->query($sql_check);
+    
+        if ($result->num_rows == 0) {
+            // Insert data absensi baru
+            $sql_insert = "INSERT INTO tb_absensi (tanggal_kerja, jam_out, id_karyawan, durasi_lembur, upah_lembur)
+                           VALUES ('$tanggal_kerja', '$jam_out', '$id_user', '$durasi_lembur', '$upah_lembur')";
+            $conn->query($sql_insert);
+        } else {
+            // Update data absensi dengan durasi lembur
+            $sql_update = "UPDATE tb_absensi 
+                           SET jam_out = '$jam_out', durasi_lembur = '$durasi_lembur', upah_lembur = '$upah_lembur'
+                           WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user'";
+            $conn->query($sql_update);
+        }
+    
+        echo "<script>
+            alert('Absen keluar berhasil.');
+            window.location.href = '?page=absen_in_out';
+        </script>";
+
     }
 
-    $upah_per_jam = 15000;
-    $durasi = new DateTime($durasi_lembur);
-    $jam = (int)$durasi->format('H');
-    $menit = (int)$durasi->format('i');
 
-    // Menghitung total upah lembur
-    $upah_jam = $jam * $upah_per_jam;
-    $upah_menit = ($menit / 60) * $upah_per_jam;
-    $upah_lembur = $upah_jam + $upah_menit;
 
-    // Output hasil
-    echo "Durasi Lembur: $durasi_lembur<br>";
-    echo "Upah Lembur: Rp" . number_format($upah_lembur, 0, ',', '.');
-
-    // Insert atau update data absensi dengan durasi lembur
-    $sql_check = "SELECT * FROM tb_absensi WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user'";
-    $result = $conn->query($sql_check);
-
-    if ($result->num_rows == 0) {
-        // Insert data absensi baru
-        $sql_insert = "INSERT INTO tb_absensi (tanggal_kerja, jam_out, id_karyawan, durasi_lembur, upah_lembur)
-                       VALUES ('$tanggal_kerja', '$jam_out', '$id_user', '$durasi_lembur', '$upah_lembur')";
-        $conn->query($sql_insert);
-    } else {
-        // Update data absensi dengan durasi lembur
-        $sql_update = "UPDATE tb_absensi 
-                       SET jam_out = '$jam_out', durasi_lembur = '$durasi_lembur', upah_lembur = '$upah_lembur'
-                       WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user'";
-        $conn->query($sql_update);
-    }
-
-    echo "<script>
-        alert('Absen keluar berhasil.');
-        window.location.href = '?page=absen_in_out';
-    </script>";
+   
     $conn->close();
 }
 
