@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Waktu pembuatan: 10 Nov 2024 pada 08.38
--- Versi server: 5.7.39
--- Versi PHP: 8.2.0
+-- Generation Time: Dec 14, 2024 at 06:59 PM
+-- Server version: 5.7.39
+-- PHP Version: 8.2.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_absen`
+-- Table structure for table `tb_absen`
 --
 
 CREATE TABLE `tb_absen` (
@@ -38,7 +38,7 @@ CREATE TABLE `tb_absen` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data untuk tabel `tb_absen`
+-- Dumping data for table `tb_absen`
 --
 
 INSERT INTO `tb_absen` (`id`, `id_karyawan`, `tanggal_absen`, `surat_sakit`, `keterangan`, `type_absen`, `status`) VALUES
@@ -50,7 +50,7 @@ INSERT INTO `tb_absen` (`id`, `id_karyawan`, `tanggal_absen`, `surat_sakit`, `ke
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_absensi`
+-- Table structure for table `tb_absensi`
 --
 
 CREATE TABLE `tb_absensi` (
@@ -64,18 +64,22 @@ CREATE TABLE `tb_absensi` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data untuk tabel `tb_absensi`
+-- Dumping data for table `tb_absensi`
 --
 
 INSERT INTO `tb_absensi` (`id`, `tanggal_kerja`, `jam_in`, `jam_out`, `id_karyawan`, `durasi_lembur`, `upah_lembur`) VALUES
 (1, '2024-11-09', '12:52:48', '20:02:35', '6', '02:02:35', '30500'),
 (2, '2024-11-08', '12:52:48', '20:02:35', '1', '02:02:35', '30500'),
-(3, '2024-11-08', '12:52:48', '20:02:35', '6', '02:02:35', '20000');
+(3, '2024-11-08', '12:52:48', '20:02:35', '6', '02:02:35', '20000'),
+(4, '2024-11-12', '10:50:13', NULL, '6', NULL, NULL),
+(7, '2024-12-14', '12:51:57', NULL, '6', NULL, NULL),
+(8, '2024-12-16', NULL, '12:52:04', '6', '00:00:00', '0'),
+(9, '2024-12-17', '13:17:22', NULL, '6', NULL, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_jadwal`
+-- Table structure for table `tb_jadwal`
 --
 
 CREATE TABLE `tb_jadwal` (
@@ -85,18 +89,21 @@ CREATE TABLE `tb_jadwal` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data untuk tabel `tb_jadwal`
+-- Dumping data for table `tb_jadwal`
 --
 
 INSERT INTO `tb_jadwal` (`id`, `tanggal_kerja`, `status`) VALUES
-(34, '2024-11-08', 'approve'),
 (35, '2024-11-09', 'approve'),
-(36, '2024-11-10', 'approve');
+(36, '2024-11-12', 'approve'),
+(37, '2024-12-14', 'approve'),
+(38, '2024-12-16', 'approve'),
+(39, '2024-12-17', 'approve'),
+(40, '2024-12-18', 'approve');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_jadwal_detail`
+-- Table structure for table `tb_jadwal_detail`
 --
 
 CREATE TABLE `tb_jadwal_detail` (
@@ -106,22 +113,24 @@ CREATE TABLE `tb_jadwal_detail` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data untuk tabel `tb_jadwal_detail`
+-- Dumping data for table `tb_jadwal_detail`
 --
 
 INSERT INTO `tb_jadwal_detail` (`id_jadwal`, `id_karyawan`, `shift`) VALUES
-('34', '1', '1'),
-('34', '6', '2'),
 ('35', '1', '2'),
 ('35', '6', '1'),
 ('35', '5', '1'),
 ('36', '1', '1'),
-('36', '6', '2');
+('36', '6', '2'),
+('37', '6', '1'),
+('38', '6', '1'),
+('39', '6', '1'),
+('40', '6', '1');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_payroll`
+-- Table structure for table `tb_payroll`
 --
 
 CREATE TABLE `tb_payroll` (
@@ -137,56 +146,17 @@ CREATE TABLE `tb_payroll` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data untuk tabel `tb_payroll`
+-- Dumping data for table `tb_payroll`
 --
 
 INSERT INTO `tb_payroll` (`id`, `id_karyawan`, `bulan_payroll`, `tahun_payroll`, `potongan`, `keterangan_potongan`, `bonus`, `total_lembur`, `total`) VALUES
-(6, '6', '11', '2024', '100000', 'Dipotong karena sering telat', '500000', '50500', '6450500');
+(6, '6', '11', '2024', '100000', 'Dipotong karena sering telat', '500000', '50500', '6450500'),
+(10, '6', '12', '2024', '1200000', 'Banyak tidak edit abse dan tanpa keterangan', '500000', '0', '5300000');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_pengadaan`
---
-
-CREATE TABLE `tb_pengadaan` (
-  `id_pengadaan` int(10) NOT NULL,
-  `jenis_pengadaan` varchar(255) DEFAULT NULL,
-  `kantor_wilayah` varchar(255) DEFAULT NULL,
-  `kantor_pelaksana` varchar(255) DEFAULT NULL,
-  `nama_instansi` varchar(255) DEFAULT NULL,
-  `rencana_penggunaan` varchar(255) DEFAULT NULL,
-  `nilai_anggaran` varchar(255) DEFAULT NULL,
-  `sk_penetapan_lokasi` varchar(255) DEFAULT NULL,
-  `luas` varchar(255) DEFAULT NULL,
-  `panjang` varchar(255) DEFAULT NULL,
-  `jumlah_bidang` varchar(255) DEFAULT NULL,
-  `persiapan` varchar(255) DEFAULT NULL,
-  `pengukuran` varchar(255) DEFAULT NULL,
-  `intervensi_satgas` varchar(255) DEFAULT NULL,
-  `pengumuman` varchar(255) DEFAULT NULL,
-  `penilaian_tanah` varchar(255) DEFAULT NULL,
-  `musyawarah` varchar(255) DEFAULT NULL,
-  `pembayaran` varchar(255) DEFAULT NULL,
-  `penyerahan_hasil` varchar(255) DEFAULT NULL,
-  `progress` varchar(255) DEFAULT NULL,
-  `permasalahan` varchar(255) DEFAULT NULL,
-  `keterangan` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data untuk tabel `tb_pengadaan`
---
-
-INSERT INTO `tb_pengadaan` (`id_pengadaan`, `jenis_pengadaan`, `kantor_wilayah`, `kantor_pelaksana`, `nama_instansi`, `rencana_penggunaan`, `nilai_anggaran`, `sk_penetapan_lokasi`, `luas`, `panjang`, `jumlah_bidang`, `persiapan`, `pengukuran`, `intervensi_satgas`, `pengumuman`, `penilaian_tanah`, `musyawarah`, `pembayaran`, `penyerahan_hasil`, `progress`, `permasalahan`, `keterangan`) VALUES
-(1, 'Strategis', 'Bengkulu', 'Bengkulu', 'ATR/BPN Bengkulu', 'RSUD Bhayangkara', '8000000000', 'SK-001', '1000', '1000', '12', '2019', '2019', '2019', '2019', '2019', '2019', '2020', '2019', '100', 'Tidak Ada', 'Tidak ada'),
-(7, 'Non Strategis', 'Argamakmur', 'Argamakmur', 'ATR/BPN Argamakmur', 'RSUD', '7500000000', 'SK-002', '1000', '1000', '2', '2020', '2020', '2020', '2020', '2020', '2020', '2020', '2020', '95', 'Tidak Ada', 'Tidak ada'),
-(8, 'Non Strategis', 'Kepahiang', 'Kepahiang', 'Kepahiang', 'RSUD Kepahiang', '1000000000', 'SK-003', '500', '1000', '3', '2019', '2019', '2019', '2019', '2019', '2019', '2019', '2019', '95', 'tidak ada', 'tidak ada');
-
--- --------------------------------------------------------
-
---
--- Struktur dari tabel `tb_shift`
+-- Table structure for table `tb_shift`
 --
 
 CREATE TABLE `tb_shift` (
@@ -196,7 +166,7 @@ CREATE TABLE `tb_shift` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data untuk tabel `tb_shift`
+-- Dumping data for table `tb_shift`
 --
 
 INSERT INTO `tb_shift` (`id`, `jam_mulai`, `jam_akhir`) VALUES
@@ -206,7 +176,7 @@ INSERT INTO `tb_shift` (`id`, `jam_mulai`, `jam_akhir`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_user`
+-- Table structure for table `tb_user`
 --
 
 CREATE TABLE `tb_user` (
@@ -219,7 +189,7 @@ CREATE TABLE `tb_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data untuk tabel `tb_user`
+-- Dumping data for table `tb_user`
 --
 
 INSERT INTO `tb_user` (`id`, `name`, `password`, `role`, `salary`, `upah_lembur`) VALUES
@@ -234,80 +204,80 @@ INSERT INTO `tb_user` (`id`, `name`, `password`, `role`, `salary`, `upah_lembur`
 --
 
 --
--- Indeks untuk tabel `tb_absen`
+-- Indexes for table `tb_absen`
 --
 ALTER TABLE `tb_absen`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `tb_absensi`
+-- Indexes for table `tb_absensi`
 --
 ALTER TABLE `tb_absensi`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `tb_jadwal`
+-- Indexes for table `tb_jadwal`
 --
 ALTER TABLE `tb_jadwal`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `tb_payroll`
+-- Indexes for table `tb_payroll`
 --
 ALTER TABLE `tb_payroll`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `tb_shift`
+-- Indexes for table `tb_shift`
 --
 ALTER TABLE `tb_shift`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `tb_user`
+-- Indexes for table `tb_user`
 --
 ALTER TABLE `tb_user`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT untuk tabel yang dibuang
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT untuk tabel `tb_absen`
+-- AUTO_INCREMENT for table `tb_absen`
 --
 ALTER TABLE `tb_absen`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_absensi`
+-- AUTO_INCREMENT for table `tb_absensi`
 --
 ALTER TABLE `tb_absensi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_jadwal`
+-- AUTO_INCREMENT for table `tb_jadwal`
 --
 ALTER TABLE `tb_jadwal`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_payroll`
+-- AUTO_INCREMENT for table `tb_payroll`
 --
 ALTER TABLE `tb_payroll`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_shift`
+-- AUTO_INCREMENT for table `tb_shift`
 --
 ALTER TABLE `tb_shift`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT untuk tabel `tb_user`
+-- AUTO_INCREMENT for table `tb_user`
 --
 ALTER TABLE `tb_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
