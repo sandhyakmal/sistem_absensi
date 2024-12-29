@@ -47,7 +47,7 @@ include 'koneksi.php';
                                 <th>Jam Out</th>
                                 <th>Durasi Lembur</th>
                                 <th>Jumlah Jam Kerja</th>
-                                
+                                <th>Status</th>
                                 <th>Aksi</th>
                                 
                             </tr>
@@ -57,10 +57,12 @@ include 'koneksi.php';
                             $no = 1;
                             $id_user =  $_SESSION['id'];
                             if ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'owner') {
-                                $sql = $conn->query(" SELECT ta.id, ta.id_karyawan, ta.tanggal_kerja, ta.jam_in, ta.jam_out,ta.durasi_lembur, tu.name FROM tb_absensi ta LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id order by id desc ");
+                                $sql = $conn->query(" SELECT ta.id, ta.id_karyawan, ta.tanggal_kerja, ta.jam_in, ta.jam_out, ta.durasi_lembur, ta.status, tu.name FROM tb_absensi ta LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id LEFT JOIN tb_absen taa ON ta.tanggal_kerja = taa.tanggal_absen AND ta.id_karyawan = taa.id_karyawan WHERE ta.status IS NULL OR taa.status = 'approve' ORDER BY id DESC ");
                             }
                             else {
-                                $sql = $conn->query(" SELECT ta.id, ta.id_karyawan, ta.tanggal_kerja, ta.jam_in, ta.jam_out, ta.durasi_lembur, tu.name FROM tb_absensi ta LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id WHERE id_karyawan = '$id_user' order by id desc ");
+                                // $sql = $conn->query(" SELECT ta.id, ta.id_karyawan, ta.tanggal_kerja, ta.jam_in, ta.jam_out, ta.durasi_lembur, ta.status, tu.name FROM tb_absensi ta LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id WHERE id_karyawan = '$id_user' ORDER BY id DESC ");
+
+                                $sql =  $conn->query(" SELECT ta.id, ta.id_karyawan, ta.tanggal_kerja, ta.jam_in, ta.jam_out, ta.durasi_lembur, ta.status, tu.name FROM tb_absensi ta LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id LEFT JOIN tb_absen taa ON ta.tanggal_kerja = taa.tanggal_absen AND ta.id_karyawan = taa.id_karyawan WHERE ta.id_karyawan = '$id_user' AND (ta.status IS NULL OR taa.status = 'approve') ORDER BY id DESC ");
                             }
                             while ($data = $sql->fetch_assoc()) {
 
@@ -87,6 +89,7 @@ include 'koneksi.php';
                                     <td><?php echo $data["jam_out"];  ?></td>
                                     <td><?php echo $data["durasi_lembur"];  ?></td>
                                     <td><?php echo $jumlah_jam_kerja;  ?></td>
+                                    <td><?php echo $data["status"];;  ?></td>
                                     
                                     <?php
                                     if ((is_null($data['jam_in']) || is_null($data['jam_out'])) && $_SESSION['role'] !== 'owner' && $_SESSION['role'] !== 'admin') {
@@ -130,7 +133,7 @@ include 'koneksi.php';
                 <form method="POST" enctype="multipart/form-data" class="row g-3">
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="date" class="form-control" value="<?php echo date('Y-m-d');?>"  id="tanggal_kerja" name="tanggal_kerja" placeholder="Tanggal" >
+                            <input readonly type="date" class="form-control" value="<?php echo date('Y-m-d');?>"  id="tanggal_kerja" name="tanggal_kerja" placeholder="Tanggal" >
                             <!-- <input type="text" class="form-control" id="datetimeInput" name="tanggal_kerja" placeholder="Tanggal kerja"> -->
                             <label for="tanggal_kerja">Tanggal kerja</label>
                         </div>

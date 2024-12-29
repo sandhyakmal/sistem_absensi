@@ -6,6 +6,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $iduserArr = isset($_POST['iduser']) && is_array($_POST['iduser']) ? $_POST['iduser'] : [];
     $shiftArr = isset($_POST['shift']) && is_array($_POST['shift']) ? $_POST['shift'] : [];
 
+
+    $sql_check_jadwal = $conn->query(" SELECT * FROM tb_jadwal WHERE tanggal_kerja = '$tanggal_kerja' ");
+
+    if ($sql_check_jadwal->num_rows > 0) {
+        echo "<script>
+            alert('Data Jadwal Kerja sudah ada');
+              window.location.href = '?page=jadwal_kerja';
+        </script>";
+        exit;
+    }
+
     // Pastikan array 'iduser' dan 'shift' memiliki jumlah elemen yang sama
     if (count($iduserArr) === count($shiftArr) && !in_array("", $shiftArr)) {
         $allInserted = true; // Flag untuk mengecek keberhasilan insert

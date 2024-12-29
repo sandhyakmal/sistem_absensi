@@ -10,6 +10,7 @@ if (isset($_POST['hitung'])) {
 
     $iduser = $_POST['iduser'];
     $bulan = $_POST['bulan'];
+
     // mengambil jumlah no in/out
     $sql_check_no_in_or_out = " SELECT COUNT(*) AS jumlah_no_in_or_out 
     FROM tb_absensi 
@@ -26,7 +27,7 @@ if (isset($_POST['hitung'])) {
     }   
 
     // mengambil jumlah no in dan no out
-    $sql_check_no_in_and_out = "    SELECT COUNT(*) AS jumlah_no_in_and_out 
+    $sql_check_no_in_and_out = " SELECT COUNT(*) AS jumlah_no_in_and_out 
             FROM tb_jadwal_detail tjd
             LEFT JOIN tb_jadwal tj ON tj.id = tjd.id_jadwal
             LEFT JOIN tb_absensi ta ON ta.tanggal_kerja = tj.tanggal_kerja
@@ -41,6 +42,8 @@ if (isset($_POST['hitung'])) {
         $row_no_in_and_out = $result_no_in_and_out->fetch_assoc();
         $jumlah_tidak_in_and_out = $row_no_in_and_out['jumlah_no_in_and_out'];   
     }
+
+    // echo "Jumlah tidak in dan out : " . $jumlah_tidak_in_and_out;
 
      // Mengambil gaji pokok karyawan dari tabel tb_user
     $sql_gaji = "SELECT CAST(salary AS DECIMAL(15,2)) as gaji_pokok FROM tb_user WHERE id = '$iduser'";
@@ -63,9 +66,9 @@ if (isset($_POST['hitung'])) {
 
     // PERHITUNGAN POTONGAN NO IN AND NO OUT  
     $potongan_no_in_and_out = 0;
-    if ($jumlah_tidak_in_and_out =  1) {
+    if ($jumlah_tidak_in_and_out >= 1 && $jumlah_tidak_in_and_out <= 2 ) {
     $potongan_no_in_and_out = $gaji_pokok * 0.10; // 10%
-    } elseif ($jumlah_tidak_in_and_out = 2) {
+    } elseif ($jumlah_tidak_in_and_out > 2 && $jumlah_tidak_in_and_out <3 ) {
     $potongan_no_in_and_out = $gaji_pokok * 0.30; // 30%
     } elseif ($jumlah_tidak_in_and_out >= 3) {
     $potongan_no_in_and_out = $gaji_pokok * 1; // 100%
@@ -210,14 +213,14 @@ if (isset($_POST['submit'])) {
 
                         <div class="col-md-12">
                             <div class="form-floating">
-                                <input readonly type="text" class="form-control" value="<?php echo isset($_POST['hitung']) ? $jumlah_tidak_in_or_out:''; ?>" placeholder="Jumlah Tidak IN / OUT per-Bulan">
+                                <input readonly type="text" class="form-control" value="<?php echo isset($_POST['hitung']) ? $jumlah_tidak_in_or_out:'0'; ?>" placeholder="Jumlah Tidak IN / OUT per-Bulan">
                                 <label for="potongna">Jumlah Tidak IN / OUT per-Bulan </label>
                             </div>
                         </div>
 
                         <div class="col-md-12">
                             <div class="form-floating">
-                                <input readonly type="text" class="form-control"  value="<?php echo isset($_POST['hitung']) ? $jumlah_tidak_in_and_out:''; ?>"  placeholder="Jumlah Tidak IN & OUT per-Bulan">
+                                <input readonly type="text" class="form-control"  value="<?php echo isset($_POST['hitung']) ? $jumlah_tidak_in_and_out:'0'; ?>"  placeholder="Jumlah Tidak IN & OUT per-Bulan">
                                 <label for="potongna">Jumlah Tidak IN & OUT per-Bulan</label>
                             </div>
                         </div>
