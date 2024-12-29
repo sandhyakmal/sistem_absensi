@@ -31,7 +31,17 @@ $sql_payroll = $conn->query("   SELECT tp.*, tu.name, tu.role, tu.salary
                                 WHERE tp.id_karyawan = '$id_karyawan' 
                                 AND tp.bulan_payroll = '$bulan' 
                                 AND tp.tahun_payroll = '$tahun' ");
-$tampil = $sql_payroll->fetch_assoc();
+
+if ($sql_payroll->num_rows > 0) {
+    $tampil = $sql_payroll->fetch_assoc();
+} else {
+    echo "<script>
+        alert('Data Payroll tidak ditemukan untuk bulan yang dipilih.');
+          window.location.href = '../../index.php?page=slip_gaji';
+    </script>";
+    exit;
+}
+
 
 //SQL Buat ambil data Absen
 $sql = $conn->query("   SELECT COALESCE(SUM(CASE WHEN type_absen = 'sakit' THEN 1 ELSE 0 END),0)  AS jumlah_sakit,
