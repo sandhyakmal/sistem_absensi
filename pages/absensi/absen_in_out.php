@@ -47,8 +47,9 @@ include 'koneksi.php';
                                 <th>Jam Out</th>
                                 <th>Durasi Lembur</th>
                                 <th>Jumlah Jam Kerja</th>
-                                <th>Status</th>
+
                                 <th>Aksi</th>
+                                 
                                 
                             </tr>
                         </thead>
@@ -57,12 +58,12 @@ include 'koneksi.php';
                             $no = 1;
                             $id_user =  $_SESSION['id'];
                             if ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'owner') {
-                                $sql = $conn->query(" SELECT ta.id, ta.id_karyawan, ta.tanggal_kerja, ta.jam_in, ta.jam_out, ta.durasi_lembur, ta.status, tu.name FROM tb_absensi ta LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id LEFT JOIN tb_absen taa ON ta.tanggal_kerja = taa.tanggal_absen AND ta.id_karyawan = taa.id_karyawan WHERE ta.status IS NULL OR taa.status = 'approve' ORDER BY id DESC ");
+                                $sql = $conn->query(" SELECT ta.id, ta.id_karyawan, ta.tanggal_kerja, ta.jam_in, ta.jam_out, ta.durasi_lembur, ta.status, tu.name FROM tb_absensi ta LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id LEFT JOIN tb_absen taa ON ta.tanggal_kerja = taa.tanggal_absen AND ta.id_karyawan = taa.id_karyawan ORDER BY id DESC ");
                             }
                             else {
                                 // $sql = $conn->query(" SELECT ta.id, ta.id_karyawan, ta.tanggal_kerja, ta.jam_in, ta.jam_out, ta.durasi_lembur, ta.status, tu.name FROM tb_absensi ta LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id WHERE id_karyawan = '$id_user' ORDER BY id DESC ");
 
-                                $sql =  $conn->query(" SELECT ta.id, ta.id_karyawan, ta.tanggal_kerja, ta.jam_in, ta.jam_out, ta.durasi_lembur, ta.status, tu.name FROM tb_absensi ta LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id LEFT JOIN tb_absen taa ON ta.tanggal_kerja = taa.tanggal_absen AND ta.id_karyawan = taa.id_karyawan WHERE ta.id_karyawan = '$id_user' AND (ta.status IS NULL OR taa.status = 'approve') ORDER BY id DESC ");
+                                $sql =  $conn->query(" SELECT ta.id, ta.id_karyawan, ta.tanggal_kerja, ta.jam_in, ta.jam_out, ta.durasi_lembur, ta.status, tu.name FROM tb_absensi ta LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id LEFT JOIN tb_absen taa ON ta.tanggal_kerja = taa.tanggal_absen AND ta.id_karyawan = taa.id_karyawan WHERE ta.id_karyawan = '$id_user' ORDER BY id DESC ");
                             }
                             while ($data = $sql->fetch_assoc()) {
 
@@ -89,10 +90,9 @@ include 'koneksi.php';
                                     <td><?php echo $data["jam_out"];  ?></td>
                                     <td><?php echo $data["durasi_lembur"];  ?></td>
                                     <td><?php echo $jumlah_jam_kerja;  ?></td>
-                                    <td><?php echo $data["status"];;  ?></td>
                                     
                                     <?php
-                                    if ((is_null($data['jam_in']) || is_null($data['jam_out'])) && $_SESSION['role'] !== 'owner' && $_SESSION['role'] !== 'admin') {
+                                    if ((is_null($data['jam_in']) || is_null($data['jam_out'])) && $_SESSION['role'] !== 'karyawan') {
                                         ?>
                                     <td>
                                         <form action="index.php?page=ubah_absensi_in_out" method="POST" style="display:inline;">
@@ -141,7 +141,8 @@ include 'koneksi.php';
 
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input  type="time" step="1"  class="form-control" id="timeInput" name="jam" placeholder="Jam" >
+                            <input type="time" step="1"  class="form-control" name="jam" placeholder="Jam" >
+                            <!-- <input type="time" step="1"  class="form-control" id="timeInput" name="jam" placeholder="Jam" > -->
                             <label for="jam">Jam</label>
                         </div>
                     </div>
@@ -172,10 +173,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['in'])) {
     $tanggal_kerja = $_POST['tanggal_kerja'];
     $jam_in = $_POST['jam'];
     $id_user = $_SESSION['id'];
+    $status = 'Tepat Waktu';
 
     // Cek apakah tanggal kerja ada di tabel tb_jadwal
-    $sql_jadwal = "SELECT * FROM tb_jadwal WHERE tanggal_kerja = '$tanggal_kerja' AND status='approve' ";
+    // $sql_jadwal = "SELECT * FROM tb_jadwal WHERE tanggal_kerja = '$tanggal_kerja' AND status='approve' ";
+    $sql_jadwal = "SELECT * FROM tb_jadwal tj LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal WHERE tj.tanggal_kerja = '$tanggal_kerja' AND tj.status='approve' AND tjd.id_karyawan = '$id_user'  ";
     $result_jadwal = $conn->query($sql_jadwal);
+
 
     if ($result_jadwal->num_rows == 0) {
         // Jika tidak ada data di tb_jadwal, tampilkan pesan error
@@ -188,10 +192,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['in'])) {
         $sql_check = "SELECT * FROM tb_absensi WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user'";
         $result = $conn->query($sql_check);
 
+        $sql_check_terlambat = " SELECT ts.jam_mulai FROM tb_jadwal tj LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal LEFT JOIN tb_shift ts ON tjd.shift = ts.id WHERE tj.tanggal_kerja = '$tanggal_kerja' AND tj.status='approve' AND tjd.id_karyawan = '$id_user'  ";
+        $result_check_terlambat = $conn->query($sql_check_terlambat);
+        $data = $result_check_terlambat->fetch_assoc();
+
+        if ($data['jam_mulai'] < $jam_in) {
+            $status = 'Terlambat';
+        } else {
+            $status = 'Masuk';
+        }
+        
         if ($result->num_rows == 0) {
             // Jika tidak ada entri absensi, tambahkan dengan jam masuk
-            $sql = "INSERT INTO tb_absensi (tanggal_kerja, jam_in, id_karyawan) VALUES ('$tanggal_kerja', '$jam_in', '$id_user')";
-            if ($conn->query($sql) === TRUE) {
+            $sql = "INSERT INTO tb_absensi (tanggal_kerja, jam_in, id_karyawan, status) VALUES ('$tanggal_kerja', '$jam_in', '$id_user', '$status' )";
+            if ($conn->query($sql) === TRUE ) {
                 echo "<script>
                     alert('Absen masuk berhasil.');
                     window.location.href = '?page=absen_in_out';
@@ -203,7 +217,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['in'])) {
             $data = $result->fetch_assoc();
             if (is_null($data['jam_in']) && is_null($data['jam_out'])) {
                 // Jika ada entri tetapi tanpa jam masuk dan jam keluar, update dengan jam masuk
-                $sql_update = "UPDATE tb_absensi SET jam_in = '$jam_in' WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user' AND jam_in IS NULL";
+                $sql_update = "UPDATE tb_absensi SET jam_in = '$jam_in', status = '$status' WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user' AND jam_in IS NULL";
                 if ($conn->query($sql_update) === TRUE) {
                     echo "<script>
                         alert('Absen masuk berhasil.');

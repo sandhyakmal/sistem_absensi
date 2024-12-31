@@ -73,14 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     $sql = "UPDATE tb_absensi SET 
                 tanggal_kerja='$tanggal_kerja', 
                 jam_in='$jam_in', 
-                jam_out='$jam_out',
-                status= 'Edit Absen'
+                jam_out='$jam_out'
             WHERE id=$id_absen";
-    
-
-    $sql_insert_edit_absen = "INSERT INTO tb_absen (id_karyawan, tanggal_absen,keterangan, type_absen, status) VALUES ('$id_karyawan','$tanggal_kerja', 'Edit Absensi','Edit Absensi','submit')";
-
-    if ($conn->query($sql) === TRUE && $conn->query($sql_insert_edit_absen) === TRUE ) {
+    if ($conn->query($sql) === TRUE) {
         echo "<script>
             alert('Data berhasil di Update');
             window.location.href = '?page=absen_in_out';

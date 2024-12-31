@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Dec 14, 2024 at 06:59 PM
+-- Generation Time: Dec 29, 2024 at 05:48 PM
 -- Server version: 5.7.39
 -- PHP Version: 8.2.0
 
@@ -44,8 +44,10 @@ CREATE TABLE `tb_absen` (
 INSERT INTO `tb_absen` (`id`, `id_karyawan`, `tanggal_absen`, `surat_sakit`, `keterangan`, `type_absen`, `status`) VALUES
 (5, '6', '2024-11-07', 'Background hardcode Klik Garasi-04.jpg', 'Sakit', 'sakit', 'submit'),
 (7, '6', '2024-11-08', NULL, 'Cuti', 'cuti', 'reject'),
-(8, '1', '2024-11-07', 'Background hardcode Klik Garasi-04.jpg', 'Sakit', 'sakit', 'submit'),
-(9, '1', '2024-11-08', NULL, 'Cuti', 'cuti', 'reject');
+(8, '1', '2024-11-09', 'Background hardcode Klik Garasi-04.jpg', 'Sakit', 'sakit', 'submit'),
+(9, '1', '2024-11-08', NULL, 'Cuti', 'cuti', 'reject'),
+(10, '6', '2024-12-14', NULL, 'Edit Absensi', 'Edit Absensi', 'approve'),
+(11, '6', '2024-11-12', NULL, 'Edit Absensi', 'Edit Absensi', 'approve');
 
 -- --------------------------------------------------------
 
@@ -60,21 +62,22 @@ CREATE TABLE `tb_absensi` (
   `jam_out` varchar(255) DEFAULT NULL,
   `id_karyawan` varchar(255) NOT NULL,
   `durasi_lembur` varchar(255) DEFAULT NULL,
-  `upah_lembur` varchar(255) DEFAULT NULL
+  `upah_lembur` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `tb_absensi`
 --
 
-INSERT INTO `tb_absensi` (`id`, `tanggal_kerja`, `jam_in`, `jam_out`, `id_karyawan`, `durasi_lembur`, `upah_lembur`) VALUES
-(1, '2024-11-09', '12:52:48', '20:02:35', '6', '02:02:35', '30500'),
-(2, '2024-11-08', '12:52:48', '20:02:35', '1', '02:02:35', '30500'),
-(3, '2024-11-08', '12:52:48', '20:02:35', '6', '02:02:35', '20000'),
-(4, '2024-11-12', '10:50:13', NULL, '6', NULL, NULL),
-(7, '2024-12-14', '12:51:57', NULL, '6', NULL, NULL),
-(8, '2024-12-16', NULL, '12:52:04', '6', '00:00:00', '0'),
-(9, '2024-12-17', '13:17:22', NULL, '6', NULL, NULL);
+INSERT INTO `tb_absensi` (`id`, `tanggal_kerja`, `jam_in`, `jam_out`, `id_karyawan`, `durasi_lembur`, `upah_lembur`, `status`) VALUES
+(1, '2024-11-09', '12:52:48', '20:02:35', '6', '02:02:35', '30500', NULL),
+(2, '2024-11-08', '12:52:48', '20:02:35', '1', '02:02:35', '30500', NULL),
+(3, '2024-11-08', '12:52:48', '20:02:35', '6', '02:02:35', '20000', NULL),
+(4, '2024-11-12', '10:50:13', '15:00:00', '6', NULL, NULL, 'Edit Absen'),
+(7, '2024-12-14', '12:51:57', '18:00:00', '6', NULL, NULL, 'Edit Absen'),
+(8, '2024-12-16', '06:00:00', '12:52:04', '6', '00:00:00', '0', NULL),
+(9, '2024-12-17', '13:17:22', '18:00:00', '6', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -151,7 +154,7 @@ CREATE TABLE `tb_payroll` (
 
 INSERT INTO `tb_payroll` (`id`, `id_karyawan`, `bulan_payroll`, `tahun_payroll`, `potongan`, `keterangan_potongan`, `bonus`, `total_lembur`, `total`) VALUES
 (6, '6', '11', '2024', '100000', 'Dipotong karena sering telat', '500000', '50500', '6450500'),
-(10, '6', '12', '2024', '1200000', 'Banyak tidak edit abse dan tanpa keterangan', '500000', '0', '5300000');
+(11, '6', '12', '2024', '1200000', 'banyak tidak edit absen', '1000000', '0', '5800000');
 
 -- --------------------------------------------------------
 
@@ -247,7 +250,7 @@ ALTER TABLE `tb_user`
 -- AUTO_INCREMENT for table `tb_absen`
 --
 ALTER TABLE `tb_absen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tb_absensi`
@@ -259,13 +262,13 @@ ALTER TABLE `tb_absensi`
 -- AUTO_INCREMENT for table `tb_jadwal`
 --
 ALTER TABLE `tb_jadwal`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `tb_payroll`
 --
 ALTER TABLE `tb_payroll`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tb_shift`
