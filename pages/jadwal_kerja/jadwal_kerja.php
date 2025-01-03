@@ -61,7 +61,7 @@ include 'koneksi.php';
                             $username = $_SESSION['username'];
                             $id_user =  $_SESSION['id'];
                             if ($_SESSION['role'] == 'admin') {
-                                $sql = $conn->query(" SELECT * FROM tb_jadwal ");
+                                $sql = $conn->query(" SELECT * FROM tb_jadwal ORDER BY tanggal_kerja ASC");
                             }
                             else {
                                 $sql = $conn->query(" SELECT * FROM tb_jadwal tj LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal WHERE tjd.id_karyawan = '$id_user' AND tj.status = 'approve' ORDER BY tanggal_kerja ASC ");

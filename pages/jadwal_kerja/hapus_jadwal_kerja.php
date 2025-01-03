@@ -7,6 +7,7 @@ include 'koneksi.php';
 $id_jadwal = $_GET['id_jadwal'];
 $del = $conn->query("DELETE FROM tb_jadwal WHERE id='$id_jadwal'");
 $del_detail = $conn->query("DELETE FROM tb_jadwal_detail WHERE id_jadwal='$id_jadwal'");
+$del_absensi = $conn->query("DELETE FROM tb_absensi WHERE id_jadwal='$id_jadwal'");
 ?>
 <script type="text/javascript">
     alert(" Data Berhasil di Hapus");

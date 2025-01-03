@@ -3,6 +3,17 @@
 include '../../koneksi.php';
 
 $bulan = $_POST['bulan'];
+$tahun = $_POST['tahun'];
+$iduser = $_POST['iduser'];
+
+
+// $bulan = "01";
+// $tahun = "2025";
+// $id_karyawan = "6";
+
+$sql_check_name = " SELECT name FROM tb_user WHERE id = '$iduser'  ";
+$result = $conn->query($sql_check_name);
+$name = $result->fetch_assoc();
 
 $nama_bulan = [
     '01' => 'Januari',
@@ -22,8 +33,6 @@ $nama_bulan = [
 // Mengambil nama bulan berdasarkan input
 $hasil_bulan = $nama_bulan[$bulan] ?? 'Bulan tidak valid';
 
-$tahun = $_POST['tahun'];
-
 ?>
 
 
@@ -32,7 +41,7 @@ $tahun = $_POST['tahun'];
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laporan Gaji Awanbrew</title>
+<title>Laporan Presensi Awanbrew</title>
 <style>
     @media print {
         @page {
@@ -153,52 +162,67 @@ $tahun = $_POST['tahun'];
 <div class="separator"></div>
 
 <!-- Judul Laporan -->
-<h2>LAPORAN GAJI</h2>
+<h2>LAPORAN PRESENSI</h2>
 
 <!-- Periode Laporan -->
 <div class="periode">
     <p>Periode: <?php echo $hasil_bulan . " " . $tahun ?></p>
+    <p>Nama Karyawan : <?php echo $name['name'] ?></p>
 </div>
 
 <!-- Tabel Laporan Gaji -->
 <table>
     <thead>
         <tr>
-            <th>No</th>
-            <th>Nama Karyawan</th>
-            <th>Gaji Pokok</th>
-            <th>Potongan</th>
-            <th>Lembur</th>
-            <th>Bonus</th>
-            <th>Total Gaji</th>
+            <th rowspan="2">No</th>
+            <th rowspan="2">Tanggal</th>
+            <th colspan="2">Jadwal Kerja</th>
+            <th colspan="2">Absensi</th>
+            <th rowspan="2">Terlambat</th>
+            <th rowspan="2">Keterangan</th>
+        </tr>
+        <tr>
+            <th>In</th>
+            <th>Out</th>
+            <th>In</th>
+            <th>Out</th>
         </tr>
     </thead>
     <tbody>
-    <?php
+       <?php
         $no = 1;
-        $sql = $conn->query("SELECT tp.*, tu.name, tu.salary FROM tb_payroll tp LEFT JOIN tb_user tu ON tp.id_karyawan = tu.id WHERE tp.bulan_payroll = '$bulan' AND tp.tahun_payroll = '$tahun' ");
+        $sql = $conn->query(" SELECT tu.name, taa.tanggal_kerja, ts.jam_mulai as JadwalIN, ts.jam_akhir AS JadwalOUT, taa.jam_in AS AbsenIN, taa.jam_out AS AbsenOut, taa.status, (CASE WHEN taa.jam_in IS NULL AND taa.jam_out IS NULL THEN 'TANPA KETERANGAN' ELSE '-' END) AS Keterangan FROM tb_absensi taa LEFT JOIN tb_jadwal tj ON taa.id_jadwal = tj.id AND taa.tanggal_kerja = tj.tanggal_kerja LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal AND tjd.id_karyawan = taa.id_karyawan LEFT JOIN tb_shift ts ON ts.id = tjd.shift LEFT JOIN tb_user tu ON taa.id_karyawan = tu.id WHERE taa.id_karyawan = '$iduser' AND MONTH(taa.tanggal_kerja) = '$bulan' AND YEAR(taa.tanggal_kerja) = '$tahun' ORDER BY taa.tanggal_kerja ASC ");
         if ($sql->num_rows == 0) {
-            echo "<script>
-                alert('Data Payroll tidak ditemukan untuk bula dan tahun yang dipilih.');
-                  window.location.href = '../../index.php?page=laporan_payroll';
-            </script>";
-            exit;
-        }
-        while ($data = $sql->fetch_assoc()) {
+            echo "<tr><td colspan='8'>Data tidak ditemukan</td></tr>";
+        } else {
+            while ($data = $sql->fetch_assoc()) {
+                // $terlambat = calculateLate($data['jadwal_in'], $data['absensi_in']); // Fungsi untuk hitung keterlambatan
+                // $total_terlambat += $terlambat; // Tambahkan terlambat ke total
         ?>
-            <tr>
-                <td><?php echo $no++; ?></td>
-                <td><?php echo $data["name"] ?></td>
-                <td><?php echo "Rp " . number_format($data["salary"], 0, ',', '.'); ?></td>
-                <td><?php echo "Rp " . number_format($data["potongan"], 0, ',', '.'); ?></td>
-                <td><?php echo "Rp " . number_format($data["total_lembur"], 0, ',', '.'); ?></td>
-                <td><?php echo "Rp " . number_format($data["bonus"], 0, ',', '.'); ?></td>
-                <td><?php echo "Rp " . number_format($data["total"], 0, ',', '.'); ?></td>
-            </tr>
-        <?php } ?>
-        <!-- Tambahkan data karyawan lainnya di sini -->
+        <tr>
+            <td><?php echo $no++; ?></td>
+            <td><?php echo date("d/m/Y", strtotime($data["tanggal_kerja"])); ?></td>
+            <td><?php echo $data["JadwalIN"]; ?></td>
+            <td><?php echo $data["JadwalOUT"]; ?></td>
+            <td><?php echo $data["AbsenIN"]; ?></td>
+            <td><?php echo $data["AbsenOut"]; ?></td>
+            <td><?php echo $data["status"]; ?></td>
+            <td><?php echo $data["Keterangan"]; ?></td>
+        </tr>
+        <?php
+            }
+        }
+        ?> 
     </tbody>
+    <!-- <tfoot>
+        <tr>
+            <td colspan="6" style="text-align: right; font-weight: bold;">Total Terlambat:</td>
+            <td style="font-weight: bold;"><?php echo $total_terlambat; ?> menit</td>
+            <td></td>
+        </tr>
+    </tfoot> -->
 </table>
+
 
 </body>
 </html>

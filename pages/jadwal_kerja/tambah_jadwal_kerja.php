@@ -34,11 +34,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $shift = $shiftArr[$i];
 
                 // Buat query insert untuk setiap baris detail jadwal
-                $sqlDetail = "INSERT INTO tb_jadwal_detail (id_jadwal, id_karyawan, shift) 
-                              VALUES ('$jadwalId', '$currentUser', '$shift')";
-
+                $sqlDetail = "INSERT INTO tb_jadwal_detail (id_jadwal, id_karyawan, shift) VALUES ('$jadwalId', '$currentUser', '$shift')";
+                
                 // Jalankan query dan cek apakah berhasil
-                if ($conn->query($sqlDetail) !== TRUE) {
+                if ($conn->query($sqlDetail) !== TRUE ) {
+                    $allInserted = false;
+                    echo "Error: " . $sqlDetail . "<br>" . $conn->error;
+                    break; // Hentikan jika ada yang gagal
+                }
+
+                $sqlAbsensi = "INSERT INTO tb_absensi (id_jadwal, tanggal_kerja, id_karyawan) VALUES ('$jadwalId','$tanggal_kerja', '$currentUser')";
+
+                if ($conn->query($sqlAbsensi) !== TRUE ) {
                     $allInserted = false;
                     echo "Error: " . $sqlDetail . "<br>" . $conn->error;
                     break; // Hentikan jika ada yang gagal
@@ -104,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                         <option selected disabled value="">Pilih Nama Karyawan</option>
                                                         <?php
                                                         
-                                                        $sql_user = "SELECT * FROM tb_user where role != 'owner' ";
+                                                        $sql_user = "SELECT * FROM tb_user where role = 'karyawan' ";
                                                         $result = $conn->query($sql_user);
 
                                                         if ($result->num_rows > 0) {

@@ -169,20 +169,39 @@ $tahun = $_POST['tahun'];
             <th>Jabatan</th>
             <th>Cuti</th>
             <th>Sakit</th>
+            <th>Tanpa Keterangan</th>
         </tr>
     </thead>
     <tbody>
     <?php
         $no = 1;
-        $sql = $conn->query("SELECT tu.name, tu.role,
-                            SUM(CASE WHEN type_absen = 'sakit' THEN 1 ELSE 0 END) AS jumlah_sakit,
-                            SUM(CASE WHEN type_absen = 'cuti' THEN 1 ELSE 0 END) AS jumlah_cuti
-                            FROM tb_absen ta
-                            LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id
-                            WHERE 
-                                MONTH(tanggal_absen) = '$bulan'
-                                AND YEAR(tanggal_absen) = '$tahun'
-                            GROUP BY  id_karyawan; ");
+        // $sql = $conn->query("SELECT tu.name, tu.role,
+        //                     SUM(CASE WHEN type_absen = 'sakit' THEN 1 ELSE 0 END) AS jumlah_sakit,
+        //                     SUM(CASE WHEN type_absen = 'cuti' THEN 1 ELSE 0 END) AS jumlah_cuti
+        //                     FROM tb_absen ta
+        //                     LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id
+        //                     WHERE 
+        //                         MONTH(tanggal_absen) = '$bulan'
+        //                         AND YEAR(tanggal_absen) = '$tahun'
+        //                     GROUP BY  id_karyawan; ");
+
+        $sql = $conn->query("   SELECT 
+                                tjd.id_karyawan, tu.name, tu.role, IFNULL(x.jumlahsakit, 0) AS JumlahSakit, IFNULL(z.jumlahcuti, 0) AS JumlahCuti,
+                                COUNT(DISTINCT tjd.id_jadwal) - SUM(CASE WHEN taa.type_absen IN ('sakit', 'cuti') THEN 1 ELSE 0 END) AS Mangkir,
+                                COUNT(DISTINCT tjd.id_jadwal) AS JumlahJadwal
+                                FROM tb_jadwal_detail tjd
+                                LEFT JOIN tb_jadwal tj ON tjd.id_jadwal = tj.id
+                                LEFT JOIN tb_absensi ta ON tj.tanggal_kerja = ta.tanggal_kerja AND ta.id_jadwal = tj.tanggal_kerja
+                                LEFT JOIN tb_absen taa ON tj.tanggal_kerja = taa.tanggal_absen AND taa.tanggal_absen = tj.tanggal_kerja
+                                LEFT JOIN tb_user tu ON tjd.id_karyawan = tu.id
+                                LEFT JOIN (SELECT DISTINCT COUNT(id_karyawan) as jumlahsakit, id_karyawan FROM tb_absen WHERE type_absen = 'sakit' AND MONTH(tanggal_absen) = '$bulan' AND YEAR(tanggal_absen) = '$tahun'  GROUP BY id_karyawan) x ON x.id_karyawan = tjd.id_karyawan
+                                LEFT JOIN (SELECT DISTINCT COUNT(id_karyawan) as jumlahcuti, id_karyawan FROM tb_absen WHERE type_absen = 'cuti' AND MONTH(tanggal_absen) = '$bulan' AND YEAR(tanggal_absen) = '$tahun'  GROUP BY id_karyawan) z ON z.id_karyawan = tjd.id_karyawan
+                                WHERE 
+                                tj.status = 'approve' 
+                                AND MONTH(tj.tanggal_kerja) = '$bulan'
+                                AND YEAR(tj.tanggal_kerja) = '$tahun'
+                                GROUP BY tjd.id_karyawan, tu.name, tu.role;
+                            ");
         if ($sql->num_rows == 0) {
             echo "<script>
                 alert('Data Absensi tidak ditemukan untuk bula dan tahun yang dipilih.');
@@ -196,8 +215,9 @@ $tahun = $_POST['tahun'];
                 <td><?php echo $no++; ?></td>
                 <td><?php echo $data["name"] ?></td>
                 <td><?php echo $data["role"] ?></td>
-                <td><?php echo $data["jumlah_cuti"] ?></td>
-                <td><?php echo $data["jumlah_sakit"] ?></td>
+                <td><?php echo $data["JumlahCuti"] ?></td>
+                <td><?php echo $data["JumlahSakit"] ?></td>
+                <td><?php echo $data["Mangkir"] ?></td>
             </tr>
         <?php } ?>
         <!-- Tambahkan data karyawan lainnya di sini -->

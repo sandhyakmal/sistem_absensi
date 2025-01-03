@@ -118,6 +118,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
         $sqlDeleteDetail = "DELETE FROM tb_jadwal_detail WHERE id_jadwal = '$id_jadwal'";
         $conn->query($sqlDeleteDetail);
 
+        $sqlDeleteAbsesi = "DELETE FROM tb_absensi WHERE id_jadwal = '$id_jadwal'";
+        $conn->query($sqlDeleteAbsesi);
+
         // Pastikan array 'hari' dan 'shift' memiliki jumlah elemen yang sama
         if (count($iduserArr) === count($shiftArr) && !in_array("", $shiftArr)) {
             $allInserted = true;
@@ -134,6 +137,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
                     $allInserted = false;
                     echo "Error: " . $sqlDetail . "<br>" . $conn->error;
                     break;
+                }
+
+                $sqlAbsensi = "INSERT INTO tb_absensi (id_jadwal, tanggal_kerja, id_karyawan) VALUES ('$id_jadwal','$tanggal_kerja', '$iduser')";
+
+                if ($conn->query($sqlAbsensi) !== TRUE ) {
+                    $allInserted = false;
+                    echo "Error: " . $sqlDetail . "<br>" . $conn->error;
+                    break; // Hentikan jika ada yang gagal
                 }
             }
 

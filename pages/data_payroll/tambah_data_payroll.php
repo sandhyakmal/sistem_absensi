@@ -191,6 +191,7 @@ if (isset($_POST['submit'])) {
 
                     <!-- Floating Labels Form -->
                     <form method="POST" enctype="multipart/form-data" class="row g-3">
+                        
                         <div class="col-md-12">
                             <select required class="form-select" name="iduser" id="iduser" aria-label="Floating label select example">
                                 <option selected disabled value="">Pilih Nama Karyawan</option>

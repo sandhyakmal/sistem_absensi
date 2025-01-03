@@ -141,8 +141,8 @@ include 'koneksi.php';
 
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="time" step="1"  class="form-control" name="jam" placeholder="Jam" >
-                            <!-- <input type="time" step="1"  class="form-control" id="timeInput" name="jam" placeholder="Jam" > -->
+                            <!-- <input type="time" step="1"  class="form-control" name="jam" placeholder="Jam" > -->
+                            <input type="time" step="1"  class="form-control" id="timeInput" name="jam" placeholder="Jam" >
                             <label for="jam">Jam</label>
                         </div>
                     </div>

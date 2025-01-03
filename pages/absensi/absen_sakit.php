@@ -165,6 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<script>
             alert('File type tidak sesuai');
             </script>";
+            exit;
         }
 
         // Pengecekan ukuran file
@@ -172,6 +173,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<script>
             alert('File Size melebihi 40Mb');
             </script>";
+            exit;
         }
 
         // Pindahkan file ke lokasi tujuan
@@ -179,8 +181,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<script>
             alert('File Tidak dapat diupload');
             </script>";
+            exit;
         }
     }
+
+    $sql_jadwal = "SELECT * FROM tb_jadwal tj LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal WHERE tj.tanggal_kerja = '$tanggal_absen' AND tj.status='approve' AND tjd.id_karyawan = '$id_user'";
+
+    $result_jadwal = $conn->query($sql_jadwal);
+
+    // Validasi hasil
+    if ($result_jadwal->num_rows == 0) {
+        echo "<script>
+            alert('Tanggal kerja tidak ditemukan dalam jadwal Anda. Input Sakit tidak dapat dilakukan.');
+            window.location.href = '?page=absen_sakit';
+        </script>";
+        exit;
+    }
+
 
     // Query untuk memasukkan data ke dalam tabel
     $sql = "INSERT INTO tb_absen (id_karyawan, tanggal_absen, surat_sakit,keterangan, type_absen, status) VALUES ('$id_user','$tanggal_absen','$file_names[0]','$keterangan','sakit','submit')";

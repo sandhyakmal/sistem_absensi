@@ -12,10 +12,10 @@ $id_user =  $_SESSION['id'];
 
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Laporan Gaji Karyawan</h5>
+                    <h5 class="card-title">Laporan Presensi Karyawan</h5>
 
                     <!-- Floating Labels Form -->
-                    <form action="./pages/laporan/pdf_laporan_payroll.php" target="_blank" method="POST" enctype="multipart/form-data" class="row g-3">
+                    <form action="./pages/laporan/pdf_laporan_presensi.php" target="_blank" method="POST" enctype="multipart/form-data" class="row g-3">
 
                         <div class="col-md-12">
                             <input type="hidden" class="form-control" value="<?php echo $id_user; ?>" id="id_karyawan" name="id_karyawan">
@@ -47,6 +47,27 @@ $id_user =  $_SESSION['id'];
                                     for ($year = $previousYear; $year <= $currentYear; $year++) {
                                         echo "<option value=\"$year\">$year</option>";
                                     }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12">
+                            <select required class="form-select" name="iduser" id="iduser" aria-label="Floating label select example">
+                                <option selected disabled value="">Pilih Nama Karyawan</option>
+                                <?php
+                                $sql_user = "SELECT * FROM tb_user WHERE role = 'karyawan'";
+                                $result = $conn->query($sql_user);
+
+                                if ($result->num_rows > 0) {
+                                    // Loop setiap row dan tambahkan sebagai option
+                                    while ($row = $result->fetch_assoc()) {
+                                        // Cek apakah iduser sama dengan id karyawan di row saat ini
+                                        $selected = (isset($_POST['iduser']) && $_POST['iduser'] == $row["id"]) ? 'selected' : '';
+                                        echo '<option value="' . $row["id"] . '" ' . $selected . '>' . $row["name"] . '</option>';
+                                    }
+                                } else {
+                                    echo '<option disabled>Tidak ada data</option>';
+                                }
                                 ?>
                             </select>
                         </div>

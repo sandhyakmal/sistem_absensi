@@ -137,6 +137,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tanggal_absen = $_POST['tanggal_absen'];
     $keterangan = $_POST['keterangan'];
     $id_user =  $_SESSION['id'];
+
+    $sql_jadwal = "SELECT * FROM tb_jadwal tj LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal WHERE tj.tanggal_kerja = '$tanggal_absen' AND tj.status='approve' AND tjd.id_karyawan = '$id_user'";
+    $result_jadwal = $conn->query($sql_jadwal);
+
+    // Validasi hasil
+    if ($result_jadwal->num_rows == 0) {
+        echo "<script>
+            alert('Tanggal kerja tidak ditemukan dalam jadwal Anda. Input Cuti tidak dapat dilakukan.');
+            window.location.href = '?page=absen_cuti';
+        </script>";
+        exit;
+    }
     
     // Query untuk memasukkan data ke dalam tabel
     $sql = "INSERT INTO tb_absen (id_karyawan, tanggal_absen,keterangan, type_absen, status) VALUES ('$id_user','$tanggal_absen', '$keterangan','cuti','submit')";

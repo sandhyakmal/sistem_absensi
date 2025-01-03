@@ -43,6 +43,7 @@ $slip_gaji = "/hris/index.php?page=slip_gaji";
 
 $laporan_payroll = "/hris/index.php?page=laporan_payroll";
 $laporan_absensi = "/hris/index.php?page=laporan_absensi";
+$laporan_presensi = "/hris/index.php?page=laporan_presensi";
 
 ?>
 
@@ -316,7 +317,7 @@ $laporan_absensi = "/hris/index.php?page=laporan_absensi";
                     <i class="bi bi-file-earmark-pdf"></i><span>Laporan</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul id="pages-nav" class="nav-content collapse
-                <?php if ( $current_page_url == $laporan_absensi || $current_page_url == $laporan_payroll )  {
+                <?php if ( $current_page_url == $laporan_absensi || $current_page_url == $laporan_payroll || $current_page_url == $laporan_presensi )  {
                     echo "show";
                 } ?>" data-bs-parent="#sidebar-nav">
                     <?php
@@ -333,6 +334,12 @@ $laporan_absensi = "/hris/index.php?page=laporan_absensi";
                         <li>
                             <a href="?page=laporan_absensi" class="<?php echo ($current_page_url == $laporan_absensi) ? 'active' : ''; ?>">
                                 <i class="bi bi-circle"></i><span>Laporan Absensi</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="?page=laporan_presensi" class="<?php echo ($current_page_url == $laporan_presensi) ? 'active' : ''; ?>">
+                                <i class="bi bi-circle"></i><span>Laporan Presensi</span>
                             </a>
                         </li>
                 </ul>
@@ -428,6 +435,8 @@ $laporan_absensi = "/hris/index.php?page=laporan_absensi";
             include "pages/laporan/laporan_payroll.php";
         } else if ($page == 'laporan_absensi') {
             include "pages/laporan/laporan_absensi.php";
+        } else if ($page == 'laporan_presensi') {
+            include "pages/laporan/laporan_presensi.php";
         } 
 
         ?>
