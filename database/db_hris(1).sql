@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Dec 29, 2024 at 05:48 PM
+-- Generation Time: Jan 03, 2025 at 12:15 PM
 -- Server version: 5.7.39
 -- PHP Version: 8.2.0
 
@@ -42,12 +42,8 @@ CREATE TABLE `tb_absen` (
 --
 
 INSERT INTO `tb_absen` (`id`, `id_karyawan`, `tanggal_absen`, `surat_sakit`, `keterangan`, `type_absen`, `status`) VALUES
-(5, '6', '2024-11-07', 'Background hardcode Klik Garasi-04.jpg', 'Sakit', 'sakit', 'submit'),
-(7, '6', '2024-11-08', NULL, 'Cuti', 'cuti', 'reject'),
-(8, '1', '2024-11-09', 'Background hardcode Klik Garasi-04.jpg', 'Sakit', 'sakit', 'submit'),
-(9, '1', '2024-11-08', NULL, 'Cuti', 'cuti', 'reject'),
-(10, '6', '2024-12-14', NULL, 'Edit Absensi', 'Edit Absensi', 'approve'),
-(11, '6', '2024-11-12', NULL, 'Edit Absensi', 'Edit Absensi', 'approve');
+(15, '6', '2025-01-02', 'agya.png', 'sa', 'sakit', 'submit'),
+(16, '1', '2025-01-03', NULL, 'Cuti', 'cuti', 'submit');
 
 -- --------------------------------------------------------
 
@@ -57,6 +53,7 @@ INSERT INTO `tb_absen` (`id`, `id_karyawan`, `tanggal_absen`, `surat_sakit`, `ke
 
 CREATE TABLE `tb_absensi` (
   `id` int(11) NOT NULL,
+  `id_jadwal` varchar(255) DEFAULT NULL,
   `tanggal_kerja` varchar(255) NOT NULL,
   `jam_in` varchar(255) DEFAULT NULL,
   `jam_out` varchar(255) DEFAULT NULL,
@@ -70,14 +67,11 @@ CREATE TABLE `tb_absensi` (
 -- Dumping data for table `tb_absensi`
 --
 
-INSERT INTO `tb_absensi` (`id`, `tanggal_kerja`, `jam_in`, `jam_out`, `id_karyawan`, `durasi_lembur`, `upah_lembur`, `status`) VALUES
-(1, '2024-11-09', '12:52:48', '20:02:35', '6', '02:02:35', '30500', NULL),
-(2, '2024-11-08', '12:52:48', '20:02:35', '1', '02:02:35', '30500', NULL),
-(3, '2024-11-08', '12:52:48', '20:02:35', '6', '02:02:35', '20000', NULL),
-(4, '2024-11-12', '10:50:13', '15:00:00', '6', NULL, NULL, 'Edit Absen'),
-(7, '2024-12-14', '12:51:57', '18:00:00', '6', NULL, NULL, 'Edit Absen'),
-(8, '2024-12-16', '06:00:00', '12:52:04', '6', '00:00:00', '0', NULL),
-(9, '2024-12-17', '13:17:22', '18:00:00', '6', NULL, NULL, NULL);
+INSERT INTO `tb_absensi` (`id`, `id_jadwal`, `tanggal_kerja`, `jam_in`, `jam_out`, `id_karyawan`, `durasi_lembur`, `upah_lembur`, `status`) VALUES
+(21, '49', '2025-01-01', NULL, NULL, '1', NULL, NULL, NULL),
+(22, '49', '2025-01-01', '12:00:00', '18:00:00', '6', NULL, NULL, NULL),
+(29, '50', '2025-01-03', '12:00:00', '19:06:59', '6', '01:06:59', '16500', NULL),
+(30, '50', '2025-01-03', NULL, NULL, '1', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -96,12 +90,9 @@ CREATE TABLE `tb_jadwal` (
 --
 
 INSERT INTO `tb_jadwal` (`id`, `tanggal_kerja`, `status`) VALUES
-(35, '2024-11-09', 'approve'),
-(36, '2024-11-12', 'approve'),
-(37, '2024-12-14', 'approve'),
-(38, '2024-12-16', 'approve'),
-(39, '2024-12-17', 'approve'),
-(40, '2024-12-18', 'approve');
+(43, '2025-01-02', 'approve'),
+(49, '2025-01-01', 'approve'),
+(50, '2025-01-03', 'approve');
 
 -- --------------------------------------------------------
 
@@ -120,15 +111,11 @@ CREATE TABLE `tb_jadwal_detail` (
 --
 
 INSERT INTO `tb_jadwal_detail` (`id_jadwal`, `id_karyawan`, `shift`) VALUES
-('35', '1', '2'),
-('35', '6', '1'),
-('35', '5', '1'),
-('36', '1', '1'),
-('36', '6', '2'),
-('37', '6', '1'),
-('38', '6', '1'),
-('39', '6', '1'),
-('40', '6', '1');
+('43', '6', '1'),
+('49', '1', '1'),
+('49', '6', '2'),
+('50', '6', '1'),
+('50', '1', '2');
 
 -- --------------------------------------------------------
 
@@ -147,14 +134,6 @@ CREATE TABLE `tb_payroll` (
   `total_lembur` varchar(255) NOT NULL,
   `total` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `tb_payroll`
---
-
-INSERT INTO `tb_payroll` (`id`, `id_karyawan`, `bulan_payroll`, `tahun_payroll`, `potongan`, `keterangan_potongan`, `bonus`, `total_lembur`, `total`) VALUES
-(6, '6', '11', '2024', '100000', 'Dipotong karena sering telat', '500000', '50500', '6450500'),
-(11, '6', '12', '2024', '1200000', 'banyak tidak edit absen', '1000000', '0', '5800000');
 
 -- --------------------------------------------------------
 
@@ -199,7 +178,6 @@ INSERT INTO `tb_user` (`id`, `name`, `password`, `role`, `salary`, `upah_lembur`
 (1, 'Karyawan', 'karyawan', 'karyawan', '5000000', '15000'),
 (2, 'Owner', 'owner', 'owner', '20000000', '15000'),
 (4, 'Admin', 'admin', 'admin', '6000000', '15000'),
-(5, 'karyawan1', 'karyawan1', 'karyawan', '4500000', '15000'),
 (6, 'Sandhy', 'sandhy', 'karyawan', '6000000', '20000');
 
 --
@@ -250,25 +228,25 @@ ALTER TABLE `tb_user`
 -- AUTO_INCREMENT for table `tb_absen`
 --
 ALTER TABLE `tb_absen`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `tb_absensi`
 --
 ALTER TABLE `tb_absensi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `tb_jadwal`
 --
 ALTER TABLE `tb_jadwal`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `tb_payroll`
 --
 ALTER TABLE `tb_payroll`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tb_shift`

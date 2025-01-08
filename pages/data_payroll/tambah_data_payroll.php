@@ -13,34 +13,45 @@ if (isset($_POST['hitung'])) {
     $bulan = $_POST['bulan'];
 
     // mengambil jumlah no in/out
-    $sql_check_no_in_or_out = " SELECT COUNT(*) AS jumlah_no_in_or_out 
-    FROM tb_absensi 
-    WHERE MONTH(tanggal_kerja) = '$bulan' 
-    AND YEAR(tanggal_kerja) = '$tahun' 
-    AND (jam_in IS NULL OR jam_out IS NULL) 
-    AND id_karyawan = '$iduser' "; 
+    $sql_check_no_in_or_out = " SELECT COUNT(DISTINCT ta.id) AS jumlah_no_in_or_out
+                                FROM tb_absensi ta
+                                LEFT JOIN tb_jadwal tj  ON tj.id = ta.id_jadwal AND tj.tanggal_kerja = ta.tanggal_kerja
+                                WHERE MONTH(ta.tanggal_kerja) = '$bulan' 
+                                AND YEAR(ta.tanggal_kerja) = '$tahun' 
+                                AND ((ta.jam_in IS NOT NULL AND ta.jam_out IS NULL) OR (ta.jam_in IS NULL AND ta.jam_out IS NOT NULL))
+                                AND ta.id_karyawan = '$iduser' "; 
     
     $result_no_in_or_out = $conn->query($sql_check_no_in_or_out);
 
     if ($result_no_in_or_out->num_rows > 0) {
         $row_no_in_or_out = $result_no_in_or_out->fetch_assoc();
         $jumlah_tidak_in_or_out = $row_no_in_or_out['jumlah_no_in_or_out']; 
-    }   
+    }  
+
+    // echo "jumlah no in / no out : " . $jumlah_tidak_in_or_out  . "<br>"; ; 
 
     // mengambil jumlah no in dan no out
-    $sql_check_no_in_and_out = " SELECT COUNT(*) AS jumlah_no_in_and_out 
-            FROM tb_jadwal_detail tjd
-            LEFT JOIN tb_jadwal tj ON tj.id = tjd.id_jadwal
-            LEFT JOIN tb_absensi ta ON ta.tanggal_kerja = tj.tanggal_kerja
-            WHERE ta.tanggal_kerja IS NULL AND tjd.id_karyawan = '$iduser'
-            AND MONTH(tj.tanggal_kerja) = '$bulan' 
-            AND YEAR(tj.tanggal_kerja) = '$tahun' "; 
+    $sql_check_no_in_and_out = " SELECT COUNT(DISTINCT ta.id) AS jumlah_no_in_and_out
+                                FROM tb_absensi ta
+                                LEFT JOIN tb_jadwal tj ON tj.id = ta.id_jadwal AND tj.tanggal_kerja = ta.tanggal_kerja
+                                LEFT JOIN tb_absen taa ON taa.tanggal_absen = ta.tanggal_kerja
+                                WHERE ta.jam_in IS NULL 
+                                    AND ta.jam_out IS NULL
+                                    AND ta.id_karyawan = '$iduser'
+                                    AND MONTH(ta.tanggal_kerja) = '$bulan'
+                                    AND YEAR(ta.tanggal_kerja) = '$tahun'
+                                    AND tj.status = 'approve'
+                                    AND taa.tanggal_absen IS NULL
+                                ";
+            
     $result_no_in_and_out = $conn->query($sql_check_no_in_and_out);
   
     if ($result_no_in_and_out->num_rows > 0) {
         $row_no_in_and_out = $result_no_in_and_out->fetch_assoc();
         $jumlah_tidak_in_and_out = $row_no_in_and_out['jumlah_no_in_and_out'];   
     }
+
+    // echo "jumlah no in and no out : " . $jumlah_tidak_in_and_out . "<br>"; 
 
     // mengambil jumlah terlambat
     $sql_check_telambat = " SELECT COUNT(*) AS jumlah_terlambat 
@@ -55,6 +66,8 @@ if (isset($_POST['hitung'])) {
         $row_terlambat = $result_check_terlambat->fetch_assoc();
         $jumlah_terlambat = $row_terlambat['jumlah_terlambat'];   
     }
+
+    // echo "jumlah terlambat : " . $jumlah_terlambat . "<br>"; ; 
 
 
      // Mengambil gaji pokok karyawan dari tabel tb_user
@@ -114,6 +127,9 @@ if (isset($_POST['submit'])) {
 
     $potongan = str_replace(".", "", $potongan);
     $bonus = str_replace(".", "", $bonus);
+    if ($bonus == ""){
+        $bonus = '0';
+    }
     
     // echo " ID USER  ".$iduser."<br>"; 
     // echo " Bulan  ".$bulan."<br>"; 
@@ -162,7 +178,7 @@ if (isset($_POST['submit'])) {
         // echo $gaji_pokok;
         
         // Menghitung total gaji
-        $total_gaji = $gaji_pokok + $lembur - $potongan + $bonus;
+        $total_gaji = $gaji_pokok + $lembur - $potongan + (float)$bonus ;
 
         // Insert data ke tabel tb_payroll
         $sql_insert = "INSERT INTO tb_payroll (id_karyawan, bulan_payroll, tahun_payroll, potongan,keterangan_potongan, bonus,total_lembur, total) 
@@ -219,10 +235,10 @@ if (isset($_POST['submit'])) {
                             <select required class="form-select" id="bulan" name="bulan" aria-label="Floating label select example">
                                 <?php
                                     $bulan_array = [
-                                        1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April",
-                                        5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus",
-                                        9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember"
-                                    ];
+                                        "01" => "Januari", "02" => "Februari", "03" => "Maret", "04" => "April",
+                                        "05" => "Mei", "06" => "Juni", "07" => "Juli", "08" => "Agustus",
+                                        "09" => "September", "10" => "Oktober", "11" => "November", "12" => "Desember"
+                                    ];                                    
                                     foreach ($bulan_array as $key => $value) {
                                         $selected = (isset($_POST['bulan']) && $_POST['bulan'] == $key) ? 'selected' : '';
                                         echo "<option value=\"$key\" $selected>$value</option>";
@@ -267,7 +283,7 @@ if (isset($_POST['submit'])) {
                         
                         <div class="col-md-12">
                             <div class="form-floating">
-                                <input type="text" class="form-control" id="bonus" name="bonus" placeholder="Bonus">
+                                <input type="text" value = '0' class="form-control" id="bonus" name="bonus" placeholder="Bonus">
                                 <label for="bonus">Bonus (Rp)</label>
                             </div>
                         </div>

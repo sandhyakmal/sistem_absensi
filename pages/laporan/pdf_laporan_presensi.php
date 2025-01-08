@@ -191,7 +191,36 @@ $hasil_bulan = $nama_bulan[$bulan] ?? 'Bulan tidak valid';
     <tbody>
        <?php
         $no = 1;
-        $sql = $conn->query(" SELECT tu.name, taa.tanggal_kerja, ts.jam_mulai as JadwalIN, ts.jam_akhir AS JadwalOUT, taa.jam_in AS AbsenIN, taa.jam_out AS AbsenOut, taa.status, (CASE WHEN taa.jam_in IS NULL AND taa.jam_out IS NULL THEN 'TANPA KETERANGAN' ELSE '-' END) AS Keterangan FROM tb_absensi taa LEFT JOIN tb_jadwal tj ON taa.id_jadwal = tj.id AND taa.tanggal_kerja = tj.tanggal_kerja LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal AND tjd.id_karyawan = taa.id_karyawan LEFT JOIN tb_shift ts ON ts.id = tjd.shift LEFT JOIN tb_user tu ON taa.id_karyawan = tu.id WHERE taa.id_karyawan = '$iduser' AND MONTH(taa.tanggal_kerja) = '$bulan' AND YEAR(taa.tanggal_kerja) = '$tahun' ORDER BY taa.tanggal_kerja ASC ");
+        $sql = $conn->query("   SELECT 
+                                tu.name, 
+                                taa.tanggal_kerja, 
+                                ts.jam_mulai as JadwalIN, 
+                                ts.jam_akhir AS JadwalOUT, 
+                                taa.jam_in AS AbsenIN, 
+                                taa.jam_out AS AbsenOut, 
+                                taa.status, 
+                                (
+                                    CASE 
+                                    WHEN ta.keterangan IS NOT NULL THEN ta.keterangan
+                                    WHEN taa.jam_in IS NULL AND taa.jam_out IS NULL THEN 'TANPA KETERANGAN' 
+                                    ELSE '-' 
+                                    END
+                                ) AS Keterangan 
+                                FROM 
+                                tb_absensi taa 
+                                LEFT JOIN tb_jadwal tj ON taa.id_jadwal = tj.id AND taa.tanggal_kerja = tj.tanggal_kerja 
+                                LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal AND tjd.id_karyawan = taa.id_karyawan 
+                                LEFT JOIN tb_shift ts ON ts.id = tjd.shift 
+                                LEFT JOIN tb_user tu ON taa.id_karyawan = tu.id 
+                                LEFT JOIN tb_absen ta ON ta.id_karyawan = taa.id_karyawan AND ta.tanggal_absen = taa.tanggal_kerja 
+                                WHERE 
+                                taa.id_karyawan = '$iduser' 
+                                AND MONTH(taa.tanggal_kerja) = '$bulan' 
+                                AND YEAR(taa.tanggal_kerja) = '$tahun'
+                                AND (ta.status IS NULL OR ta.status != 'reject') 
+                                ORDER BY 
+                                taa.tanggal_kerja ASC
+                                ");
         if ($sql->num_rows == 0) {
             echo "<tr><td colspan='8'>Data tidak ditemukan</td></tr>";
         } else {
