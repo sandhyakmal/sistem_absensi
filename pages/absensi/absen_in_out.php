@@ -131,6 +131,7 @@ include 'koneksi.php';
             </div>
             <div class="modal-body">
                 <form method="POST" enctype="multipart/form-data" class="row g-3">
+                    
                     <div class="col-md-6">
                         <div class="form-floating">
                             <input readonly type="date" class="form-control" value="<?php echo date('Y-m-d');?>"  id="tanggal_kerja" name="tanggal_kerja" placeholder="Tanggal" >
@@ -166,7 +167,7 @@ include 'koneksi.php';
 <!-- END MODAL INSERT -->
 
 <?php
-include 'koneksi.php'; // Pastikan koneksi ke database
+// include 'koneksi.php';
 
 // Fungsi untuk absensi masuk
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['in'])) {
@@ -174,6 +175,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['in'])) {
     $jam_in = $_POST['jam'];
     $id_user = $_SESSION['id'];
     $status = 'Tepat Waktu';
+
+    $distance = $_SESSION['distance']; 
+
+    if ($distance >= 100) {
+        echo "<script>
+            alert('Jarak Anda lebih dari 100 Meter dari Kantor. Absen IN tidak dapat dilakukan');
+            window.location.href = '?page=absen_in_out';
+        </script>";
+        exit;
+    };
+
 
     // Cek apakah tanggal kerja ada di tabel tb_jadwal
     // $sql_jadwal = "SELECT * FROM tb_jadwal WHERE tanggal_kerja = '$tanggal_kerja' AND status='approve' ";
@@ -249,6 +261,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['out'])) {
     $tanggal_kerja = $_POST['tanggal_kerja'];
     $jam_out = $_POST['jam'];
     $id_user = $_SESSION['id'];
+
+    $distance = $_SESSION['distance']; 
+
+    if ($distance >= 100) {
+        echo "<script>
+            alert('Jarak Anda lebih dari 100 Meter dari Kantor. Absen OUT tidak dapat dilakukan');
+            window.location.href = '?page=absen_in_out';
+        </script>";
+        exit;
+    };
+
 
     // Ambil shift karyawan dari tabel jadwal
     $sqlShift = "SELECT ts.jam_mulai, ts.jam_akhir, tu.upah_lembur

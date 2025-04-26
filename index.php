@@ -355,9 +355,15 @@ $laporan_presensi = "/hris/index.php?page=laporan_presensi";
     </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
-
+            
+        
 
         <?php
+
+        // echo " latitdue : " . $_SESSION['latitude'] . "<br>"; 
+        // echo " longtitude : " . $_SESSION['longitude'] . "<br>" ;
+        // echo " distance : " . $_SESSION['distance'] . "<br>"; 
+
         // echo $current_page_url;
         // echo $view_jadwal_kerja;
         // error_reporting(0);

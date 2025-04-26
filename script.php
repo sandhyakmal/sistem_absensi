@@ -104,7 +104,7 @@
             }
         }
 
-    // Update waktu setiap detik
+        // Update waktu setiap detik
         setInterval(updateTime, 1000);
         
 </script>

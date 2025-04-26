@@ -1,11 +1,57 @@
 <?php
 session_start();
-
 include 'koneksi.php';
+
+$office_lat = -7.643844; // Ganti dengan latitude kantor
+$office_lon = 112.895916; // Ganti dengan longitude kantor
+
+function calculateDistance($lat1, $lon1, $lat2, $lon2) {
+  $earth_radius = 6371000; // Radius bumi dalam meter
+
+  $lat1 = is_numeric($lat1) ? $lat1 : 0;
+  $lon1 = is_numeric($lon1) ? $lon1 : 0;
+  $lat2 = is_numeric($lat2) ? $lat2 : 0;
+  $lon2 = is_numeric($lon2) ? $lon2 : 0;
+
+  // Konversi derajat ke radian
+  $lat1 = deg2rad($lat1);
+  $lon1 = deg2rad($lon1);
+  $lat2 = deg2rad($lat2);
+  $lon2 = deg2rad($lon2);
+
+  // Rumus Haversine
+  $dlat = $lat2 - $lat1;
+  $dlon = $lon2 - $lon1;
+
+  $a = sin($dlat / 2) * sin($dlat / 2) +
+       cos($lat1) * cos($lat2) *
+       sin($dlon / 2) * sin($dlon / 2);
+
+  $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+  $distance = $earth_radius * $c;
+  return round($distance, 2); // Jarak dalam meter (dibulatkan)
+}
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $username = $_POST['username'];
   $password = $_POST['password'];
+
+  $user_lat = $_POST['latitude'] ?? null;
+  $user_lon = $_POST['longitude'] ?? null;
+
+  // Pastikan nilai valid (numeric), jika tidak, set default ke 0
+  $user_lat = is_numeric($user_lat) ? $user_lat : 0;
+  $user_lon = is_numeric($user_lon) ? $user_lon : 0;
+
+  // Hitung jarak
+  $distance = calculateDistance($office_lat, $office_lon, $user_lat, $user_lon);
+
+  // Jika jarak lebih dari 500 meter, set jarak default ke 1000 meter
+  if ($distance > 500) {
+      $distance = 1000;
+  }
 
   $sql = "SELECT * FROM tb_user WHERE name='$username' AND password='$password'";
   $result = $conn->query($sql);
@@ -16,12 +62,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['id'] = $row['id'];
     $_SESSION['username'] = $row['name'];
 
+    $_SESSION['latitude'] = $user_lat; // Simpan latitude ke session
+    $_SESSION['longitude'] = $user_lon; // Simpan longitude ke session
+    $_SESSION['distance'] = $distance; // Simpan jarak ke session
+
     
     header("Location: index.php?page=dashboard");
     exit();
-    // if (isset($_SESSION['username'])){
-    //   header("Location: index.php?page=dashboard");
-    // }
   } else {
     echo "<script>
     alert('Username atau Password Salah');
@@ -113,6 +160,8 @@ $conn->close();
                     <div class="col-12">
                       <label for="yourUsername" class="form-label">Username</label>
                       <div class="input-group has-validation">
+                        <input type="hidden" name="latitude" class="form-control" id="latitude" >
+                        <input type="hidden"  name="longitude" class="form-control" id="longitude" >
                         <input type="text" name="username" class="form-control" id="yourUsername" required>
                         <div class="invalid-feedback">Please enter your username.</div>
                       </div>
@@ -152,6 +201,24 @@ $conn->close();
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            document.getElementById("latitude").value = position.coords.latitude;
+            document.getElementById("longitude").value = position.coords.longitude;
+          },
+          function (error) {
+            alert("Lokasi tidak dapat diakses. Izinkan akses lokasi pada browser.");
+          }
+        );
+      } else {
+        alert("Geolocation tidak didukung oleh browser ini.");
+      }
+    });
+  </script>
 
 </body>
 

@@ -61,9 +61,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         <div class="col-md-12">
                             <select required class="form-select" name="role" aria-label="Floating label select example">
-                                <option selected disabled value="">Pilih Role</option>
+                                <option selected disabled value="">- Pilih Role -</option>
                                 <option value="karyawan">Karyawan</option>
-                                <option value="admin">admin</option>
+                                <option value="admin">Admin</option>
+                                <option value="owner">Owner</option>
                             </select>
                         </div>
                         
