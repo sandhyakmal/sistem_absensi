@@ -2,8 +2,9 @@
 session_start();
 include 'koneksi.php';
 
-$office_lat = -7.643844; // Ganti dengan latitude kantor
-$office_lon = 112.895916; // Ganti dengan longitude kantor
+$office_lat = -6.266479398529523; // Ganti dengan latitude kantor
+$office_lon = 106.77477833782605; // Ganti dengan longitude kantor
+
 
 function calculateDistance($lat1, $lon1, $lat2, $lon2) {
   $earth_radius = 6371000; // Radius bumi dalam meter
@@ -47,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   // Hitung jarak
   $distance = calculateDistance($office_lat, $office_lon, $user_lat, $user_lon);
-
+  
   // Jika jarak lebih dari 500 meter, set jarak default ke 1000 meter
   if ($distance > 500) {
       $distance = 1000;

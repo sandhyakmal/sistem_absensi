@@ -2,6 +2,8 @@
 // Menghubungkan ke database
 include 'koneksi.php';
 
+$distance = $_SESSION['distance'];
+
 ?>
 
 <div class="pagetitle">
@@ -140,6 +142,11 @@ include 'koneksi.php';
                         </div>
                     </div>
 
+                   
+                    <input readonly type="hidden" id="image_data" class="form-control" name="image_data" placeholder="image_data" >
+                    <input readonly type="text"  class="form-control" value="<?php echo $distance;  ?>" name="distance" placeholder="distance" >
+
+
                     <div class="col-md-6">
                         <div class="form-floating">
                             <!-- <input type="time" step="1"  class="form-control" name="jam" placeholder="Jam" > -->
@@ -147,6 +154,12 @@ include 'koneksi.php';
                             <label for="jam">Jam</label>
                         </div>
                     </div>
+
+                    <video id="video" height="50px" autoplay></video>
+                    <br>
+                    <button  id="capture">Ambil Foto</button>
+                    <br><br>
+                    <canvas id="canvas" width="300" height="200"></canvas>
 
                     <!-- <div class="text-center">
                         <button type="button" id="tambah-baris" class="btn btn-info">Tambah Row</button>
@@ -175,8 +188,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['in'])) {
     $jam_in = $_POST['jam'];
     $id_user = $_SESSION['id'];
     $status = 'Tepat Waktu';
+    $distance = $_POST['distance']; 
+    $img = $_POST['image_data'];
 
-    $distance = $_SESSION['distance']; 
+    // Hapus metadata
+    $img = str_replace('data:image/png;base64,', '', $img);
+    $img = str_replace(' ', '+', $img);
+
+    // Decode base64 menjadi binary data
+    $data = base64_decode($img);
+
+    // Buat nama file unik
+    $file_name = 'absen_' . date('Ymd_His') . '_' . $_SESSION['id'] . '.png';
+
+    // Simpan file ke server
+    file_put_contents('file_bukti/' . $file_name, $data);
+
+
 
     if ($distance >= 100) {
         echo "<script>
@@ -187,73 +215,73 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['in'])) {
     };
 
 
-    // Cek apakah tanggal kerja ada di tabel tb_jadwal
-    // $sql_jadwal = "SELECT * FROM tb_jadwal WHERE tanggal_kerja = '$tanggal_kerja' AND status='approve' ";
-    $sql_jadwal = "SELECT * FROM tb_jadwal tj LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal WHERE tj.tanggal_kerja = '$tanggal_kerja' AND tj.status='approve' AND tjd.id_karyawan = '$id_user'  ";
-    $result_jadwal = $conn->query($sql_jadwal);
+    // // Cek apakah tanggal kerja ada di tabel tb_jadwal
+    // // $sql_jadwal = "SELECT * FROM tb_jadwal WHERE tanggal_kerja = '$tanggal_kerja' AND status='approve' ";
+    // $sql_jadwal = "SELECT * FROM tb_jadwal tj LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal WHERE tj.tanggal_kerja = '$tanggal_kerja' AND tj.status='approve' AND tjd.id_karyawan = '$id_user'  ";
+    // $result_jadwal = $conn->query($sql_jadwal);
 
 
-    if ($result_jadwal->num_rows == 0) {
-        // Jika tidak ada data di tb_jadwal, tampilkan pesan error
-        echo "<script>
-            alert('Tanggal kerja tidak ditemukan dalam jadwal Anda. Absen masuk tidak dapat dilakukan.');
-            window.location.href = '?page=absen_in_out';
-        </script>";
-    } else {
-        // Cek apakah sudah ada entri absensi pada tanggal yang sama untuk user ini
-        $sql_check = "SELECT * FROM tb_absensi WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user'";
-        $result = $conn->query($sql_check);
+    // if ($result_jadwal->num_rows == 0) {
+    //     // Jika tidak ada data di tb_jadwal, tampilkan pesan error
+    //     echo "<script>
+    //         alert('Tanggal kerja tidak ditemukan dalam jadwal Anda. Absen masuk tidak dapat dilakukan.');
+    //         window.location.href = '?page=absen_in_out';
+    //     </script>";
+    // } else {
+    //     // Cek apakah sudah ada entri absensi pada tanggal yang sama untuk user ini
+    //     $sql_check = "SELECT * FROM tb_absensi WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user'";
+    //     $result = $conn->query($sql_check);
 
-        $sql_check_terlambat = " SELECT ts.jam_mulai FROM tb_jadwal tj LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal LEFT JOIN tb_shift ts ON tjd.shift = ts.id WHERE tj.tanggal_kerja = '$tanggal_kerja' AND tj.status='approve' AND tjd.id_karyawan = '$id_user'  ";
-        $result_check_terlambat = $conn->query($sql_check_terlambat);
-        $data = $result_check_terlambat->fetch_assoc();
+    //     $sql_check_terlambat = " SELECT ts.jam_mulai FROM tb_jadwal tj LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal LEFT JOIN tb_shift ts ON tjd.shift = ts.id WHERE tj.tanggal_kerja = '$tanggal_kerja' AND tj.status='approve' AND tjd.id_karyawan = '$id_user'  ";
+    //     $result_check_terlambat = $conn->query($sql_check_terlambat);
+    //     $data = $result_check_terlambat->fetch_assoc();
 
-        if ($data['jam_mulai'] < $jam_in) {
-            $status = 'Terlambat';
-        } else {
-            $status = 'Masuk';
-        }
+    //     if ($data['jam_mulai'] < $jam_in) {
+    //         $status = 'Terlambat';
+    //     } else {
+    //         $status = 'Masuk';
+    //     }
         
-        if ($result->num_rows == 0) {
-            // Jika tidak ada entri absensi, tambahkan dengan jam masuk
-            $sql = "INSERT INTO tb_absensi (tanggal_kerja, jam_in, id_karyawan, status) VALUES ('$tanggal_kerja', '$jam_in', '$id_user', '$status' )";
-            if ($conn->query($sql) === TRUE ) {
-                echo "<script>
-                    alert('Absen masuk berhasil.');
-                    window.location.href = '?page=absen_in_out';
-                </script>";
-            } else {
-                echo "Error: " . $sql . "<br>" . $conn->error;
-            }
-        } else {
-            $data = $result->fetch_assoc();
-            if (is_null($data['jam_in']) && is_null($data['jam_out'])) {
-                // Jika ada entri tetapi tanpa jam masuk dan jam keluar, update dengan jam masuk
-                $sql_update = "UPDATE tb_absensi SET jam_in = '$jam_in', status = '$status' WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user' AND jam_in IS NULL";
-                if ($conn->query($sql_update) === TRUE) {
-                    echo "<script>
-                        alert('Absen masuk berhasil.');
-                        window.location.href = '?page=absen_in_out';
-                    </script>";
-                } else {
-                    echo "Error: " . $sql_update . "<br>" . $conn->error;
-                }
-            } elseif (!is_null($data['jam_out'])) {
-                // Jika jam_out sudah terisi, tampilkan pesan bahwa absen masuk tidak bisa dilakukan lagi
-                echo "<script>
-                    alert('Anda tidak dapat melakukan absen masuk karena sudah melakukan absen keluar.');
-                    window.location.href = '?page=absen_in_out';
-                </script>";
-            } else {
-                echo "<script>
-                    alert('Anda sudah melakukan absen masuk hari ini.');
-                    window.location.href = '?page=absen_in_out';
-                </script>";
-            }
-        }
-    }
+    //     if ($result->num_rows == 0) {
+    //         // Jika tidak ada entri absensi, tambahkan dengan jam masuk
+    //         $sql = "INSERT INTO tb_absensi (tanggal_kerja, jam_in, id_karyawan, status) VALUES ('$tanggal_kerja', '$jam_in', '$id_user', '$status' )";
+    //         if ($conn->query($sql) === TRUE ) {
+    //             echo "<script>
+    //                 alert('Absen masuk berhasil.');
+    //                 window.location.href = '?page=absen_in_out';
+    //             </script>";
+    //         } else {
+    //             echo "Error: " . $sql . "<br>" . $conn->error;
+    //         }
+    //     } else {
+    //         $data = $result->fetch_assoc();
+    //         if (is_null($data['jam_in']) && is_null($data['jam_out'])) {
+    //             // Jika ada entri tetapi tanpa jam masuk dan jam keluar, update dengan jam masuk
+    //             $sql_update = "UPDATE tb_absensi SET jam_in = '$jam_in', status = '$status' WHERE tanggal_kerja = '$tanggal_kerja' AND id_karyawan = '$id_user' AND jam_in IS NULL";
+    //             if ($conn->query($sql_update) === TRUE) {
+    //                 echo "<script>
+    //                     alert('Absen masuk berhasil.');
+    //                     window.location.href = '?page=absen_in_out';
+    //                 </script>";
+    //             } else {
+    //                 echo "Error: " . $sql_update . "<br>" . $conn->error;
+    //             }
+    //         } elseif (!is_null($data['jam_out'])) {
+    //             // Jika jam_out sudah terisi, tampilkan pesan bahwa absen masuk tidak bisa dilakukan lagi
+    //             echo "<script>
+    //                 alert('Anda tidak dapat melakukan absen masuk karena sudah melakukan absen keluar.');
+    //                 window.location.href = '?page=absen_in_out';
+    //             </script>";
+    //         } else {
+    //             echo "<script>
+    //                 alert('Anda sudah melakukan absen masuk hari ini.');
+    //                 window.location.href = '?page=absen_in_out';
+    //             </script>";
+    //         }
+    //     }
+    // }
 
-    $conn->Close();
+    // $conn->Close();
 }
 
 // Fungsi untuk absensi keluar
@@ -261,6 +289,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['out'])) {
     $tanggal_kerja = $_POST['tanggal_kerja'];
     $jam_out = $_POST['jam'];
     $id_user = $_SESSION['id'];
+
+    // print_r($_POST);
+
 
     $distance = $_SESSION['distance']; 
 
@@ -344,9 +375,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['out'])) {
         </script>";
 
     }
-
-
-
    
     $conn->close();
 }
