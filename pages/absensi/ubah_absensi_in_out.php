@@ -65,6 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     $jam_in = $_POST['jam_in'];
     $jam_out = $_POST['jam_out'];
     $id_karyawan = $_POST['id_karyawan'];
+    $status_edit = 'Edited';
 
     $jam_in = str_replace(".", ":", $jam_in);
     $jam_out = str_replace(".", ":", $jam_out);
@@ -73,7 +74,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     $sql = "UPDATE tb_absensi SET 
                 tanggal_kerja='$tanggal_kerja', 
                 jam_in='$jam_in', 
-                jam_out='$jam_out'
+                jam_out='$jam_out',
+                status_edit='$status_edit'
             WHERE id=$id_absen";
     if ($conn->query($sql) === TRUE) {
         echo "<script>

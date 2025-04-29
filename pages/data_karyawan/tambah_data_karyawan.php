@@ -4,17 +4,17 @@ include 'koneksi.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $password = $_POST['password'];
-    $salary = $_POST['salary'];
+    // $salary = $_POST['salary'];
     $role = $_POST['role'];
-    $upah_lembur = $_POST['upah_lembur'];
+    // $upah_lembur = $_POST['upah_lembur'];
 
     // Hapus titik pemisah ribuan
     $salary = str_replace('.', '', $salary);
     $upah_lembur = str_replace('.', '', $upah_lembur);
 
     // Query untuk memasukkan data
-    $sql = "INSERT INTO tb_user (name, password, salary, role, upah_lembur)
-    VALUES ('$name', '$password', $salary, '$role', $upah_lembur)";  
+    $sql = "INSERT INTO tb_user (name, password,  role)
+    VALUES ('$name', '$password', '$role')";  
 
     // echo $sql;
 
@@ -64,11 +64,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <option selected disabled value="">- Pilih Role -</option>
                                 <option value="karyawan">Karyawan</option>
                                 <option value="admin">Admin</option>
-                                <option value="owner">Owner</option>
+                                <option value="atasan">Atasan</option>
                             </select>
                         </div>
                         
-                        <div class="col-md-6">
+                        <!-- <div class="col-md-6">
                             <div class="form-floating">
                                 <input required type="text" class="form-control" id="salary" name="salary" placeholder="Salary">
                                 <label for="salary">Salary (Rp)</label>
@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input required type="text" class="form-control" id="upah_lembur" name="upah_lembur" placeholder="Upah Lembur">
                                 <label for="upah_lembur">Upah Lembur (Rp)</label>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary">Submit</button>

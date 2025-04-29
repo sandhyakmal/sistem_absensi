@@ -2,8 +2,9 @@
 session_start();
 include 'koneksi.php';
 
-$office_lat = -6.266479398529523; // Ganti dengan latitude kantor
-$office_lon = 106.77477833782605; // Ganti dengan longitude kantor
+$office_lat = -6.299088035811712; // Ganti dengan latitude kantor
+$office_lon = 106.76075785786101; // Ganti dengan longitude kantor
+
 
 
 function calculateDistance($lat1, $lon1, $lat2, $lon2) {

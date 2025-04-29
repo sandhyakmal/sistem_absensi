@@ -22,7 +22,11 @@ include 'koneksi.php';
                     <h5 class="card-title">
                         Data Karyawan
                         &nbsp; | &nbsp;
+                        <?php
+                           if ($role != 'karyawan') { 
+                        ?>
                         <a href="index.php?page=tambah_data_karyawan" class="btn btn-primary btn-sm"><i class="bi bi-plus">Tambah Data Karyawan</i></a>
+                        <?php } ?>
                         <!-- &nbsp; | &nbsp;
                         <a href="#" class="btn btn-primary btn-sm"><i class="bi bi-printer"> Cetak Perencanaan Excel</i></a> -->
 
@@ -33,23 +37,36 @@ include 'koneksi.php';
                             <tr>
                                 <th>No.</th>
                                 <th>Nama</th>
-                                <th>Salary</th>
-                                <th>Upah Lembur</th>
+                                <!-- <th>Salary</th>
+                                <th>Upah Lembur</th> -->
+                                <?php
+                                  if ($role != 'karyawan') { 
+                                ?>
                                 <th>Aksi</th>
+                                <?php } ?>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
                             $no = 1;
-                            $sql = $conn->query(" SELECT * FROM tb_user ");
+                            if ($role == 'karyawan') {
+                                $sql = $conn->query(" SELECT * FROM tb_user WHERE name = '$username' ");
+                            } else {
+                                $sql = $conn->query(" SELECT * FROM tb_user ");
+                            }
+                            // $sql = $conn->query(" SELECT * FROM tb_user ");
                             while ($data = $sql->fetch_assoc()) {
                             ?>
                                 <tr>
                                     <td><?php echo $no++; ?></td>
                                     <td><?php echo $data["name"] ?></td>
-                                    <td><?php echo "Rp " . number_format($data["salary"], 0, ',', '.'); ?></td>
-                                    <td><?php echo "Rp " . number_format($data["upah_lembur"], 0, ',', '.'); ?></td>
-                                     <td>
+                                    <!-- <td><?php echo "Rp " . number_format($data["salary"], 0, ',', '.'); ?></td>
+                                    <td><?php echo "Rp " . number_format($data["upah_lembur"], 0, ',', '.'); ?></td> -->
+                                    <?php
+                                           if ($role != 'karyawan') { 
+                                        ?>
+                                    <td>
+                                       
                                         <form action="index.php?page=ubah_data_karyawan" method="POST" style="display:inline;">
                                             <input type="hidden" name="id_karyawan" value="<?php echo $data['id']; ?>">
                                             <button type="submit" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> Edit</button>
@@ -57,7 +74,9 @@ include 'koneksi.php';
                                         <!-- <a href="index.php?page=ubah_data_karyawan&id_karyawan=<?php echo $data['id'] ?>" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> Edit</a> -->
 
                                         <a onclick="return confirm('Ingin Menghapus data ?')" href="index.php?page=hapus_data_karyawan&id_karyawan=<?php echo $data['id'] ?>" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Hapus</a>
+                                       
                                     </td>
+                                    <?php } ?>
                                 </tr>
                             <?php } ?>
                         </tbody>

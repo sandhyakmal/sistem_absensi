@@ -2,27 +2,9 @@
 // Menghubungkan ke database
 include '../../koneksi.php';
 
-$bulan = $_POST['bulan'];
 
-$nama_bulan = [
-    '01' => 'Januari',
-    '02' => 'Februari',
-    '03' => 'Maret',
-    '04' => 'April',
-    '05' => 'Mei',
-    '06' => 'Juni',
-    '07' => 'Juli',
-    '08' => 'Agustus',
-    '09' => 'September',
-    '10' => 'Oktober',
-    '11' => 'November',
-    '12' => 'Desember',
-];
-
-// Mengambil nama bulan berdasarkan input
-$hasil_bulan = $nama_bulan[$bulan] ?? 'Bulan tidak valid';
-
-$tahun = $_POST['tahun'];
+$dari = $_POST['dari'];
+$sampai = $_POST['sampai'];
 
 ?>
 
@@ -32,7 +14,7 @@ $tahun = $_POST['tahun'];
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laporan Absensi Awanbrew</title>
+<title>Laporan Absensi </title>
 <style>
     @media print {
         @page {
@@ -137,27 +119,13 @@ $tahun = $_POST['tahun'];
 </head>
 <body>
 
-<!-- Kop Surat -->
-<div class="kop-wrapper">
-    <div class="kop-surat">
-        <img src="../../assets/img/awanbrew.png" alt="Logo Awanbrew">
-        <div class="kop-text">
-            <h1 style="text-align:center;">AWANBREW</h1>
-            <p style="text-align:center;" class="subheading">COFFEE | EATERY | PASTRY | CHEESECAKE</p>
-            <p style="text-align:center;">Jl. Raden Patah No.A2, Pasuruan 67139</p>
-            <p style="text-align:center;">Telp. +6281334187948</p>
-        </div>
-    </div>
-</div>
-
-<div class="separator"></div>
-
 <!-- Judul Laporan -->
 <h2>LAPORAN ABSENSI</h2>
 
 <!-- Periode Laporan -->
 <div class="periode">
-    <p>Periode: <?php echo $hasil_bulan . " " . $tahun ?></p>
+    <p>Periode: <?php echo date("d-m-Y", strtotime($dari)) . ' - ' .  date("d-m-Y", strtotime($sampai))   ?> </p>
+
 </div>
 
 <!-- Tabel Laporan Gaji -->
@@ -167,7 +135,7 @@ $tahun = $_POST['tahun'];
             <th>No</th>
             <th>Nama Karyawan</th>
             <th>Jabatan</th>
-            <th>Cuti</th>
+            <th>Cuti/Izin</th>
             <th>Sakit</th>
             <th>Tanpa Keterangan</th>
         </tr>
@@ -176,7 +144,7 @@ $tahun = $_POST['tahun'];
     <?php
         $no = 1;
 
-        $sql = $conn->query("   SELECT 
+        $sql = $conn->query(" SELECT 
                                     ta.id_karyawan, 
                                     tu.name, 
                                     tu.role, 
@@ -187,10 +155,9 @@ $tahun = $_POST['tahun'];
                                         COUNT(CASE WHEN ta.jam_in IS NULL AND ta.jam_out IS NULL THEN 1 END) -
                                         COUNT(CASE WHEN taa.type_absen IN ('sakit', 'cuti') THEN 1 END),
                                         0
-                                    ) AS Mangkir,
-                                    COUNT(DISTINCT tj.id) AS JumlahJadwal
+                                    ) AS Mangkir
+                                    
                                 FROM tb_absensi ta
-                                LEFT JOIN tb_jadwal tj ON tj.id = ta.id_jadwal AND tj.tanggal_kerja = ta.tanggal_kerja
                                 LEFT JOIN tb_absen taa ON taa.id_karyawan = ta.id_karyawan AND taa.tanggal_absen = ta.tanggal_kerja
                                 LEFT JOIN tb_user tu ON ta.id_karyawan = tu.id
                                 LEFT JOIN 
@@ -201,9 +168,9 @@ $tahun = $_POST['tahun'];
                                         FROM 
                                             tb_absen 
                                         WHERE 
-                                            type_absen = 'sakit' 
-                                            AND MONTH(tanggal_absen) = '$bulan' 
-                                            AND YEAR(tanggal_absen) = '$tahun'  
+                                           	type_absen = 'sakit' 
+											AND tanggal_absen BETWEEN '$dari' AND '$sampai' 
+                                        	AND status = 'approve' 
                                         GROUP BY 
                                             id_karyawan
                                     ) x ON x.id_karyawan = ta.id_karyawan
@@ -215,24 +182,22 @@ $tahun = $_POST['tahun'];
                                         FROM 
                                             tb_absen 
                                         WHERE 
-                                            type_absen = 'cuti' 
-                                            AND MONTH(tanggal_absen) = '$bulan' 
-                                            AND YEAR(tanggal_absen) = '$tahun'  
+                                           	type_absen = 'cuti' 
+											AND tanggal_absen BETWEEN '$dari' AND '$sampai' 
+                                        	AND status = 'approve' 
                                         GROUP BY 
                                             id_karyawan
                                     ) z ON z.id_karyawan = ta.id_karyawan
                                 WHERE 
-                                    tj.status = 'approve'
-                                    AND MONTH(tj.tanggal_kerja) = '$bulan'
-                                    AND YEAR(tj.tanggal_kerja) = '$tahun'
+                                  tanggal_absen BETWEEN '$dari' AND '$sampai' 
                                 GROUP BY 
                                     ta.id_karyawan, 
                                     tu.name, 
                                     tu.role
-                             ");
+                                 ");
         if ($sql->num_rows == 0) {
             echo "<script>
-                alert('Data Absensi tidak ditemukan untuk bula dan tahun yang dipilih.');
+                alert('Data Absensi tidak ditemukan untuk range tersebut.');
                   window.location.href = '../../index.php?page=laporan_absensi';
             </script>";
             exit;

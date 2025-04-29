@@ -1,4 +1,11 @@
 <?php
+session_set_cookie_params([
+    'path' => '/',
+    'domain' => 'localhost',
+    'secure' => false,
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
 session_start();
 
 // Pastikan pengguna sudah login dan memiliki session usernamegit push -u origin main
@@ -15,6 +22,7 @@ date_default_timezone_set('Asia/Jakarta');
 
 // Ambil session username
 $username = $_SESSION['username'];
+$role = $_SESSION['role'];
 
 $current_page_url = $_SERVER['REQUEST_URI'];
 $dashboard_href = "/hris/index.php?page=dashboard";
@@ -37,11 +45,6 @@ $ubah_absensi_in_out = "/hris/index.php?page=ubah_absensi_in_out";
 $approval_absen = "/hris/index.php?page=approval_absen";
 $view_absen = "/hris/index.php?page=view_absen";
 
-$data_payroll = "/hris/index.php?page=data_payroll";
-$tambah_data_payroll = "/hris/index.php?page=tambah_data_payroll";
-$slip_gaji = "/hris/index.php?page=slip_gaji";
-
-$laporan_payroll = "/hris/index.php?page=laporan_payroll";
 $laporan_absensi = "/hris/index.php?page=laporan_absensi";
 $laporan_presensi = "/hris/index.php?page=laporan_presensi";
 
@@ -165,7 +168,7 @@ $laporan_presensi = "/hris/index.php?page=laporan_presensi";
 
             <!-- Start Data Karyawan -->
             <?php
-            if ($_SESSION['role'] != 'karyawan') {
+            // if ($_SESSION['role'] != 'karyawan') {
             ?>
                 <li class="nav-item">
                     <a class="nav-link
@@ -179,12 +182,12 @@ $laporan_presensi = "/hris/index.php?page=laporan_presensi";
                     </a>
                 </li>
             <?php
-            }
+            // }
             ?>
             <!-- End Data Karyawan -->
 
             <!-- Start Manajemen Jadwal Kerja -->
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link
                  <?php if ($current_page_url != $jadwal_kerja_href || $current_page_url != $tambah_jadwal_href || $current_page_url != $ubah_jadwal_href || $current_page_url != $approval_jadwal_kerja || $current_page_url != $view_jadwal_kerja) {
                         echo "collapsed";
@@ -199,7 +202,7 @@ $laporan_presensi = "/hris/index.php?page=laporan_presensi";
                 } ?>" data-bs-parent="#sidebar-nav">
 
                     <?php
-                        if ($_SESSION['role'] != 'owner') {
+                        if ($_SESSION['role'] != 'atasan') {
                     ?>
                         <li>
                             <a href="?page=jadwal_kerja" class="<?php echo ($current_page_url == $jadwal_kerja_href || $current_page_url == $tambah_jadwal_href || $current_page_url == $ubah_jadwal_href ) ? 'active' : ''; ?>">
@@ -222,7 +225,7 @@ $laporan_presensi = "/hris/index.php?page=laporan_presensi";
                         }
                     ?>
                 </ul>
-            </li>
+            </li> -->
             <!-- End Manajemen Jadwal Kerja -->
 
             <!-- Start Absensi -->
@@ -255,7 +258,7 @@ $laporan_presensi = "/hris/index.php?page=laporan_presensi";
                         </a>
                     </li>
                     <?php
-                        if ($_SESSION['role'] == 'owner' ){
+                        if ($_SESSION['role'] == 'atasan' ){
                     ?>
                     <li>
                         <a href="?page=approval_absen" class="<?php echo ($current_page_url == $approval_absen || $current_page_url == $view_absen) ? 'active' : ''; ?>">
@@ -269,42 +272,9 @@ $laporan_presensi = "/hris/index.php?page=laporan_presensi";
             </li>
             <!-- End Absensi -->
 
-             <!-- Start Payroll -->
-            <li class="nav-item">
-                <a class="nav-link 
-                 <?php if ($current_page_url != $data_payroll || $current_page_url != $slip_gaji   ) {
-                        echo "collapsed";
-                    } else {
-                        echo "";
-                    } ?>" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-cash-stack"></i><span>Data Payroll</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="components-nav" class="nav-content collapse
-                <?php if ( $current_page_url == $data_payroll || $current_page_url == $tambah_data_payroll || $current_page_url == $slip_gaji )  {
-                    echo "show";
-                } ?>" data-bs-parent="#sidebar-nav">
-                    <?php
-                        if ($_SESSION['role'] == 'owner') {
-                    ?>
-                    <li>
-                        <a href="?page=data_payroll" class="<?php echo ($current_page_url == $data_payroll || $current_page_url == $tambah_data_payroll) ? 'active' : ''; ?>">
-                            <i class="bi bi-circle"></i><span>Data Payroll</span>
-                        </a>
-                    </li>
-                    <?php
-                       }
-                    ?>
-                    <li>
-                        <a href="?page=slip_gaji" class="<?php echo ($current_page_url == $slip_gaji) ? 'active' : ''; ?>">
-                            <i class="bi bi-circle"></i><span>Slip Gaji</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <!-- End Payroll -->
 
             <?php
-                if ($_SESSION['role'] == 'owner' || $_SESSION['role'] == 'admin') {
+                if ($_SESSION['role'] == 'atasan' || $_SESSION['role'] == 'admin') {
             ?>
             <!-- Start Laporan -->
              <li class="nav-item">
@@ -320,26 +290,9 @@ $laporan_presensi = "/hris/index.php?page=laporan_presensi";
                 <?php if ( $current_page_url == $laporan_absensi || $current_page_url == $laporan_payroll || $current_page_url == $laporan_presensi )  {
                     echo "show";
                 } ?>" data-bs-parent="#sidebar-nav">
-                    <?php
-                        if ($_SESSION['role'] == 'owner') {
-                    ?>
-                        <li>
-                            <a href="?page=laporan_payroll" class="<?php echo ($current_page_url == $laporan_payroll) ? 'active' : ''; ?>">
-                                <i class="bi bi-circle"></i><span>Laporan Payroll</span>
-                            </a>
-                        </li>
-                    <?php
-                        }
-                    ?>
                         <li>
                             <a href="?page=laporan_absensi" class="<?php echo ($current_page_url == $laporan_absensi) ? 'active' : ''; ?>">
                                 <i class="bi bi-circle"></i><span>Laporan Absensi</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="?page=laporan_presensi" class="<?php echo ($current_page_url == $laporan_presensi) ? 'active' : ''; ?>">
-                                <i class="bi bi-circle"></i><span>Laporan Presensi</span>
                             </a>
                         </li>
                 </ul>

@@ -17,7 +17,7 @@ $id_user =  $_SESSION['id'];
                     <!-- Floating Labels Form -->
                     <form action="./pages/laporan/pdf_laporan_absensi.php" target="_blank" method="POST" enctype="multipart/form-data" class="row g-3">
 
-                        <div class="col-md-12">
+                        <!-- <div class="col-md-12">
                             <input type="hidden" class="form-control" value="<?php echo $id_user; ?>" id="id_karyawan" name="id_karyawan">
                             <select required class="form-select" name="bulan" aria-label="Floating label select example">
                                 <option selected disabled value="">- Pilih Bulan -</option>
@@ -49,6 +49,20 @@ $id_user =  $_SESSION['id'];
                                     }
                                 ?>
                             </select>
+                        </div> -->
+
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <input required type="date" class="form-control" name="dari" placeholder="Tanggal" >
+                                <label for="dari">Dari Tanggal</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <input required type="date" class="form-control" name="sampai" placeholder="Tanggal" >
+                                <label for="sampai">Sampai Tanggal</label>
+                            </div>
                         </div>
                         
                         <div class="text-center">

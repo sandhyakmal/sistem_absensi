@@ -22,7 +22,7 @@ include 'koneksi.php';
                     <h5 class="card-title">
                         Data Payroll Karyawan
                         <?php
-                            if ($_SESSION['role'] == 'owner') {
+                            if ($_SESSION['role'] == 'atasan') {
                         ?>
                         &nbsp; | &nbsp;
                         <a href="index.php?page=tambah_data_payroll" class="btn btn-primary btn-sm"><i class="bi bi-plus">Tambah Data Payroll</i></a>
@@ -44,7 +44,7 @@ include 'koneksi.php';
                                 <th>Total Lembur</th>
                                 <th>Total Gaji</th>
                                 <?php
-                                    if ($_SESSION['role'] == 'owner') {
+                                    if ($_SESSION['role'] == 'atasan') {
                                 ?>
                                 <th>Aksi</th>
                                 <?php
@@ -56,7 +56,7 @@ include 'koneksi.php';
                             <?php
                             $no = 1;
                             $id_user =  $_SESSION['id'];
-                            if ($_SESSION['role'] == 'owner') {
+                            if ($_SESSION['role'] == 'atasan') {
                                 $sql = $conn->query(" SELECT tp.*, tu.name FROM tb_payroll tp LEFT JOIN tb_user tu ON tp.id_karyawan = tu.id  ");
                             }
                             else {
@@ -74,7 +74,7 @@ include 'koneksi.php';
                                     <td><?php echo "Rp " . number_format($data["total_lembur"], 0, ',', '.'); ?></td>
                                     <td><?php echo "Rp " . number_format($data["total"], 0, ',', '.'); ?></td>
                                     <?php
-                                        if ($_SESSION['role'] == 'owner') {
+                                        if ($_SESSION['role'] == 'atasan') {
                                     ?>
                                      <td>
                                         <form action="index.php?page=ubah_data_payroll" method="POST" style="display:inline;">

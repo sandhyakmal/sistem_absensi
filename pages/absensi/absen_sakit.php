@@ -93,7 +93,7 @@ include 'koneksi.php';
                             <?php
                             $no = 1;
                             $id_user =  $_SESSION['id'];
-                            if ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'owner') {
+                            if ($_SESSION['role'] == 'admin' || $_SESSION['role'] == 'atasan') {
                                 $sql = $conn->query(" SELECT * FROM tb_absen tas LEFT JOIN tb_user tu on tas.id_karyawan = tu.id WHERE tas.type_absen = 'sakit' ");
                             }
                             else {
@@ -185,15 +185,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    $sql_jadwal = "SELECT * FROM tb_jadwal tj LEFT JOIN tb_jadwal_detail tjd ON tj.id = tjd.id_jadwal WHERE tj.tanggal_kerja = '$tanggal_absen' AND tj.status='approve' AND tjd.id_karyawan = '$id_user'";
-
+    $sql_jadwal = "SELECT * FROM tb_absensi WHERE tanggal_kerja = '$tanggal_absen' AND id_karyawan = '$id_user'";
     $result_jadwal = $conn->query($sql_jadwal);
 
     // Validasi hasil
-    if ($result_jadwal->num_rows == 0) {
+    if ($result_jadwal->num_rows > 0) {
         echo "<script>
-            alert('Tanggal kerja tidak ditemukan dalam jadwal Anda. Input Sakit tidak dapat dilakukan.');
-            window.location.href = '?page=absen_sakit';
+            alert('Anda melakukan absen di tanggal kerja $tanggal_absen tidak bisa melakukan input cuti .');
+            window.location.href = '?page=absen_cuti';
         </script>";
         exit;
     }

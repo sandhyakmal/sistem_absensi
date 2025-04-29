@@ -38,20 +38,7 @@ if (isset($_POST['id_karyawan'])) {
                                 <label for="password">Password</label>
                             </div>
                         </div>
-                        
-                        <div class="col-md-6">
-                            <div class="form-floating">
-                                <input required type="text" class="form-control" id="salary" value="<?php echo $tampil['salary']; ?>" name="salary" placeholder="Salary">
-                                <label for="salary">Salary (Rp)</label>
-                            </div>
-                        </div>
 
-                        <div class="col-md-6">
-                            <div class="form-floating">
-                                <input required type="text" class="form-control" id="upah_lembur" value="<?php echo $tampil['upah_lembur']; ?>" name="upah_lembur" placeholder="Upah Lembur">
-                                <label for="upah_lembur">Upah Lembur (Rp)</label>
-                            </div>
-                        </div>
 
 
                         <div class="text-center">
@@ -74,8 +61,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     $id_karyawan =  $_POST['id_karyawan'];
     $name = $_POST['name'];
     $password = $_POST['password'];
-    $salary = $_POST['salary'];
-    $upah_lembur = $_POST['upah_lembur'];
 
     $salary = str_replace(".", "", $salary);
     $upah_lembur = str_replace(".", "", $upah_lembur);
@@ -83,9 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     // Query untuk mengupdate data dalam tabel
     $sql = "UPDATE tb_user SET 
                 name='$name', 
-                password='$password', 
-                salary='$salary',
-                upah_lembur='$upah_lembur'
+                password='$password'
             WHERE id=$id_karyawan";
 
     if ($conn->query($sql) === TRUE) {
